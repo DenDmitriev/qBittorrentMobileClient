@@ -1,0 +1,93 @@
+import Foundation
+import os
+
+extension Log {
+    private static let subsystem = Bundle.main.bundleIdentifier ?? ""
+    static let networkService = Log(subsystem: subsystem, category: "NetworkService")
+    static let refreshTokenFlow = Log(subsystem: subsystem, category: "refreshTokenFlow")
+}
+
+/// A logging utility with support for different log levels and Pulse integration.
+public struct Log: Sendable {
+    public enum LogEntry {
+        case text(String)
+        case detailed(text: String, parameters: [AnyHashable: Any])
+    }
+    
+    private let logger: Logger
+    private let category: String
+    private let isLoggingNeeded: Bool
+    
+    public init(subsystem: String, category: String, isLoggingNeeded: Bool = true) {
+        self.logger = Logger(subsystem: subsystem, category: category)
+        self.category = category
+        self.isLoggingNeeded = isLoggingNeeded
+    }
+    
+    /// Logs a debug-level message.
+    /// - Parameter logEntry: The log entry to record.
+    public func debug(logEntry: LogEntry) {
+        log(level: .debug, logEntry: logEntry)
+    }
+    
+    /// Logs an info-level message.
+    /// - Parameter logEntry: The log entry to record.
+    public func info(logEntry: LogEntry) {
+        log(level: .info, logEntry: logEntry)
+    }
+    
+    /// Logs a default-level message.
+    /// - Parameter logEntry: The log entry to record.
+    public func `default`(logEntry: LogEntry) {
+        log(level: .default, logEntry: logEntry)
+    }
+    
+    /// Logs an error-level message.
+    /// - Parameter logEntry: The log entry to record.
+    public func error(logEntry: LogEntry) {
+        log(level: .error, logEntry: logEntry)
+    }
+    
+    /// Logs a fault-level message.
+    /// - Parameter logEntry: The log entry to record.
+    public func fault(logEntry: LogEntry) {
+        log(level: .fault, logEntry: logEntry)
+    }
+    
+    private func log(level: OSLogType, logEntry: LogEntry) {
+        guard isLoggingNeeded else {
+            return
+        }
+        
+        let logMessage = getLogMessage(logEntry: logEntry)
+        
+        logger.log(level: level, "\(logMessage)")
+    }
+    
+    private func getLogMessage(logEntry: LogEntry) -> String {
+        switch logEntry {
+        case .text(let value):
+            return value
+        case let .detailed(text, parameters):
+            return getDetailedLogMessage(text: text, parameters: parameters)
+        }
+    }
+    
+    private func getDetailedLogMessage(text: String, parameters: [AnyHashable: Any]) -> String {
+        guard
+            let jsonData = try? JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted),
+            let jsonString = String(data: jsonData, encoding: .utf8)
+        else {
+            return text
+        }
+        
+        let logMessage = """
+                        ============MUDKit log message START============
+                        \(text)
+                        \(jsonString)
+                        ============MUDKit log message END==============
+                        """
+        
+        return logMessage
+    }
+}
