@@ -15,6 +15,19 @@ extension MoyaProvider {
         }
     }
     
+    func request(target: Target) async throws -> String {
+        return try await withCheckedThrowingContinuation { continuation in
+            request(target) { [weak self] result in
+                switch result {
+                case .success(let response):
+                    self?.handleRequestSuccess(response: response, continuation: continuation)
+                case .failure(let error):
+                    self?.handleRequestFailure(error: error, continuation: continuation)
+                }
+            }
+        }
+    }
+    
     func request(target: Target) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             request(target) { [weak self] result in
@@ -32,6 +45,18 @@ extension MoyaProvider {
         do {
             let filteredResponse = try response.filterSuccessfulStatusCodes()
             let decodedResponse = try filteredResponse.map(T.self)
+            
+            continuation.resume(returning: decodedResponse)
+        } catch let error {
+            let serverError = ServerError.handleError(error, response: response)
+            continuation.resume(throwing: serverError)
+        }
+    }
+    
+    private func handleRequestSuccess(response: Response, continuation: CheckedContinuation<String, Error>) {
+        do {
+            let filteredResponse = try response.filterSuccessfulStatusCodes()
+            let decodedResponse = try filteredResponse.mapString()
             
             continuation.resume(returning: decodedResponse)
         } catch let error {

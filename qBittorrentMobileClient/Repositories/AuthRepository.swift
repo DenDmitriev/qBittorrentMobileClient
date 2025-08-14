@@ -7,21 +7,33 @@
 
 import Foundation
 
-class AuthRepository: TokenRefreshProvider, AccessCookieProvider {
-    private enum Constants {
-        static let cookie = "Cookie"
+class AuthRepository: AuthRefreshProvider {
+    var username: String? {
+        didSet { UserDefaults.standard.string(forKey: AppStorageKeys.username) }
     }
-    
-    var cookie: String? { UserDefaults.standard.string(forKey: Constants.cookie) }
+    var password: String? {
+        didSet { UserDefaults.standard.string(forKey: AppStorageKeys.password) }
+    }
         
     private lazy var mobileService = MobileService.shared
     
     @discardableResult
-    func cookie() async throws -> String {
-        return ""
+    func authorizeUser() async throws -> Bool {
+        guard let username, let password else {
+            throw ServerError.unauthorized(details: .init(statusCode: 400, message: "Username or password is empty"))
+        }
+        let result = try await mobileService.requestString(target: .auth(.login(login: username, password: password)))
+        
+        if result.lowercased().contains("ok") {
+            return true
+        } else {
+            throw ServerError.unauthorized(details: .init(statusCode: 401, message: "Username or password is incorrect"))
+        }
     }
     
-    func authorizeUser(login: String, password: String) async throws {
-        try await mobileService.request(target: .auth(.login(login: login, password: password)))
+    func authorizeUser(username: String, password: String) async throws -> Bool {
+        self.username = username
+        self.password = password
+        return try await authorizeUser()
     }
 }

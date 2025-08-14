@@ -4,7 +4,7 @@ import os
 extension Log {
     private static let subsystem = Bundle.main.bundleIdentifier ?? ""
     static let networkService = Log(subsystem: subsystem, category: "NetworkService")
-    static let refreshTokenFlow = Log(subsystem: subsystem, category: "refreshTokenFlow")
+    static let authRefreshFlow = Log(subsystem: subsystem, category: "AuthRefreshFlow")
 }
 
 /// A logging utility with support for different log levels and Pulse integration.

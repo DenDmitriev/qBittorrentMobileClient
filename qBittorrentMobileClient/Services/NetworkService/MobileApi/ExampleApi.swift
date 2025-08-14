@@ -12,7 +12,6 @@ extension ExampleApi: MobileApiTargetType {
     var task: Moya.Task { getTask() }
     var formData: [MultipartFormData] { getFormData() }
     var headers: [String: String]? { getHeaders() }
-    var authorizationType: Moya.AuthorizationType? { .none }
         
     private func getBaseURL() -> URL { URL(string: "http://mediaserver.local:8080")! }
     

@@ -1,12 +1,18 @@
+//
+//  TorrentApi.swift
+//  qBittorrentMobileClient
+//
+//  Created by Denis Dmitriev on 13.08.2025.
+//
+
 import Foundation
 import Moya
 
-enum AuthApi {
-    case login(login: String, password: String)
-    case logout
+enum TorrentApi {
+    case getTorrentsInfo
 }
 
-extension AuthApi: MobileApiTargetType {
+extension TorrentApi: MobileApiTargetType {
     var baseURL: URL { getBaseURL() }
     var path: String { getPath() }
     var method: Moya.Method { getMethod() }
@@ -18,25 +24,21 @@ extension AuthApi: MobileApiTargetType {
     
     private func getPath() -> String {
         switch self {
-        case .login:
-            return "/api/v2/auth/login"
-        case .logout:
-            return "/api/v2/auth/logout"
+        case .getTorrentsInfo:
+            return "/api/v2/torrents/info"
         }
     }
     
     private func getMethod() -> Moya.Method {
         switch self {
-        case .login, .logout:
-            return .post
+        case .getTorrentsInfo:
+            return .get
         }
     }
     
     private func getTask() -> Moya.Task {
         switch self {
-        case .login:
-            return .uploadMultipart(getFormData())
-        case .logout:
+        case .getTorrentsInfo:
             return .requestPlain
         }
     }
@@ -45,12 +47,7 @@ extension AuthApi: MobileApiTargetType {
         var multipartData = [MultipartFormData]()
         
         switch self {
-        case .login(let login, let password):
-            multipartData.append(contentsOf: [
-                MultipartFormData(provider: .data(login.data(using: .utf8)!), name: "username"),
-                MultipartFormData(provider: .data(password.data(using: .utf8)!), name: "password")
-            ])
-        case .logout:
+        case .getTorrentsInfo:
             break
         }
         
@@ -59,8 +56,7 @@ extension AuthApi: MobileApiTargetType {
     
     private func getHeaders() -> [String: String]? {
         switch self {
-        case .login,
-                .logout:
+        case .getTorrentsInfo:
             return [:]
         }
     }

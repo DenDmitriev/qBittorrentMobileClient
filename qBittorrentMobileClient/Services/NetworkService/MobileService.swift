@@ -13,7 +13,7 @@ class MobileService: BaseNetworkService<MobileApi> {
     static let shared = MobileService()
         
     private init() {
-        let tokenProvider = AuthRepository()
+        let authProvider = AuthRepository()
         
         let stubClosure = { (target: MobileApi) -> Moya.StubBehavior in
             return .never
@@ -22,12 +22,12 @@ class MobileService: BaseNetworkService<MobileApi> {
         let apiProvider = MoyaProvider<MobileApi>(
             stubClosure: stubClosure,
             session: Session.defaultWithoutCache ?? Session(),
-            plugins: [LoggerPlugin.instance, AccessCookiePlugin(accessCookieProvider: tokenProvider)]
+            plugins: [LoggerPlugin.instance]
         )
                 
         super.init(
             apiProvider: apiProvider,
-            tokenRefreshProvider: tokenProvider
+            authRefreshProvider: authProvider
         )
     }
     

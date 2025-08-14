@@ -1,6 +1,6 @@
 import Foundation
 import Moya
 
-protocol MobileApiTargetType: TargetType, AccessTokenAuthorizable {
+protocol MobileApiTargetType: TargetType {
     var formData: [MultipartFormData] { get }
 }

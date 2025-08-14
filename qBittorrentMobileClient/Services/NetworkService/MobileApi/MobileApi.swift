@@ -3,6 +3,7 @@ import Moya
 
 enum MobileApi {
     case auth(AuthApi)
+    case torrent(TorrentApi)
     case example(ExampleApi)
 }
 
@@ -13,13 +14,13 @@ extension MobileApi: MobileApiTargetType {
     var task: Task { getTask() }
     var formData: [MultipartFormData] { [] }
     var headers: [String: String]? { getHeaders() }
-    var authorizationType: AuthorizationType? { .bearer }
     var sampleData: Data { getSampleData() }
 
     private func getBaseUrl() -> URL {
         switch self {
         case .example(let type as MobileApiTargetType),
-                .auth(let type as MobileApiTargetType):
+                .auth(let type as MobileApiTargetType),
+                .torrent(let type as MobileApiTargetType):
             return type.baseURL
         }
     }
@@ -27,7 +28,8 @@ extension MobileApi: MobileApiTargetType {
     private func getPath() -> String {
         switch self {
         case .example(let type as MobileApiTargetType),
-                .auth(let type as MobileApiTargetType):
+                .auth(let type as MobileApiTargetType),
+                .torrent(let type as MobileApiTargetType):
             return type.path
         }
     }
@@ -35,7 +37,8 @@ extension MobileApi: MobileApiTargetType {
     private func getMethod() -> Moya.Method {
         switch self {
         case .example(let type as MobileApiTargetType),
-                .auth(let type as MobileApiTargetType):
+                .auth(let type as MobileApiTargetType),
+                .torrent(let type as MobileApiTargetType):
             return type.method
         }
     }
@@ -43,7 +46,8 @@ extension MobileApi: MobileApiTargetType {
     private func getTask() -> Task {
         switch self {
         case .example(let type as MobileApiTargetType),
-                .auth(let type as MobileApiTargetType):
+                .auth(let type as MobileApiTargetType),
+                .torrent(let type as MobileApiTargetType):
             return type.task
         }
     }
@@ -58,7 +62,8 @@ extension MobileApi: MobileApiTargetType {
         
         switch self {
         case .example(let target as MobileApiTargetType),
-                .auth(let target as MobileApiTargetType):
+                .auth(let target as MobileApiTargetType),
+                .torrent(let target as MobileApiTargetType):
             additionalHeaders = target.headers
         }
 
@@ -77,6 +82,8 @@ extension MobileApi: MobileApiTargetType {
             return authApi.sampleData
         case .example(let exampleApi):
             return exampleApi.sampleData
+        case .torrent(let torrentApi):
+            return torrentApi.sampleData
         }
     }
 }

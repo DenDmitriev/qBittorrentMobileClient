@@ -6,34 +6,36 @@ typealias MoyaProvider = Moya.MoyaProvider
 protocol NetworkService {
     associatedtype Target: MobileApiTargetType
     
-    var onTokenRefreshFailed: (() -> Void)? { get set }
+    var onAuthRefreshFailed: (() -> Void)? { get set }
     
     func request<T: Decodable>(target: Target) async throws -> T
     func request(target: Target) async throws
 }
 
-protocol TokenRefreshProvider {
-    @discardableResult
-    func cookie() async throws -> String
+protocol AuthRefreshProvider {
+    var username: String? { get }
+    var password: String? { get }
+    
+    func authorizeUser() async throws -> Bool
 }
 
 class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
-    var onTokenRefreshFailed: (() -> Void)? { didSet { onceExecutor = OnceExecutor() } }
+    var onAuthRefreshFailed: (() -> Void)? { didSet { onceExecutor = OnceExecutor() } }
     
     private let apiProvider: MoyaProvider<Target>
-    private let tokenRefresher: TokenRefresher
+    private let authRefresher: AuthRefresher
     private var onceExecutor: OnceExecutor?
     
     init(
         apiProvider: MoyaProvider<Target>,
-        tokenRefreshProvider: TokenRefreshProvider
+        authRefreshProvider: AuthRefreshProvider
     ) {
         self.apiProvider = apiProvider
-        self.tokenRefresher = TokenRefresher(tokenRefreshProvider: tokenRefreshProvider)
+        self.authRefresher = AuthRefresher(authRefreshProvider: authRefreshProvider)
     }
     
     func request<T: Decodable>(target: Target) async throws -> T {
-        Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+        Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
         
         do {
             return try await apiProvider.request(target: target)
@@ -44,12 +46,36 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
                 let serverError = error as? ServerError,
                 case .unauthorized = serverError
             {
-                try await refreshToken()
-                Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+                try await authRefresh()
+                Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
                 return try await apiProvider.request(target: target)
             } else {
                 let logText = "NetworkService. Request \(target) failed with error \(error)"
-                Log.refreshTokenFlow.debug(logEntry: .text(logText))
+                Log.authRefreshFlow.debug(logEntry: .text(logText))
+                
+                throw error
+            }
+        }
+    }
+    
+    func requestString(target: Target) async throws -> String {
+        Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+        
+        do {
+            return try await apiProvider.request(target: target)
+        } catch {
+            try _Concurrency.Task.checkCancellation()
+            
+            if
+                let serverError = error as? ServerError,
+                case .unauthorized = serverError
+            {
+                try await authRefresh()
+                Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+                return try await apiProvider.request(target: target)
+            } else {
+                let logText = "NetworkService. Request \(target) failed with error \(error)"
+                Log.authRefreshFlow.debug(logEntry: .text(logText))
                 
                 throw error
             }
@@ -57,7 +83,7 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
     }
     
     func request(target: Target) async throws {
-        Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+        Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
         
         do {
             return try await apiProvider.request(target: target)
@@ -66,76 +92,75 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
             
             if
                 let serverError = error as? ServerError,
-                case .unauthorized = serverError
+                case .forbidden = serverError
             {
-                try await refreshToken()
-                Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
+                try await authRefresh()
+                Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
                 return try await apiProvider.request(target: target)
             } else {
                 let logText = "NetworkService. Request \(target) failed with error \(error)"
-                Log.refreshTokenFlow.debug(logEntry: .text(logText))
+                Log.authRefreshFlow.debug(logEntry: .text(logText))
                 
                 throw error
             }
         }
     }
     
-    private func refreshToken() async throws {
+    private func authRefresh() async throws {
         do {
-            try await tokenRefresher.refreshToken()
+            try await authRefresher.refreshToken()
         } catch let error {
             try _Concurrency.Task.checkCancellation()
             
             if let serverError = error as? ServerError,
-               case .unauthorized = serverError {
+               case .forbidden = serverError {
                 await onceExecutor?.runOnce { [weak self] in
-                    self?.onTokenRefreshFailed?()
-                    Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Send onTokenRefreshFailed"))
+                    self?.onAuthRefreshFailed?()
+                    Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Send onAuthRefreshFailed"))
                 }
             }
             
             if let serverError = error as? ServerError,
                case .tokenExpired = serverError {
                 await onceExecutor?.runOnce { [weak self] in
-                    self?.onTokenRefreshFailed?()
-                    Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. Send onTokenRefreshFailed"))
+                    self?.onAuthRefreshFailed?()
+                    Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Send onAuthRefreshFailed"))
                 }
             }
                            
-            Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. RefreshToken request failed. \(error)"))
+            Log.authRefreshFlow.debug(logEntry: .text("NetworkService. AuthRefresh request failed. \(error)"))
             throw error
         }
     }
 }
 
 private extension BaseNetworkService {
-    actor TokenRefresher {
-        private let tokenRefreshProvider: TokenRefreshProvider
-        private var refreshTokenTask: _Concurrency.Task<Void, Error>?
+    actor AuthRefresher {
+        private let authRefreshProvider: AuthRefreshProvider
+        private var refreshAuthTask: _Concurrency.Task<Void, Error>?
                 
-        init(tokenRefreshProvider: TokenRefreshProvider) {
-            self.tokenRefreshProvider = tokenRefreshProvider
+        init(authRefreshProvider: AuthRefreshProvider) {
+            self.authRefreshProvider = authRefreshProvider
         }
 
-        // swiftlint:disable force_unwrapping
         func refreshToken() async throws {
-            Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. RefreshToken method called"))
+            Log.authRefreshFlow.debug(logEntry: .text("NetworkService. AuthRefresh method called"))
             
-            if refreshTokenTask == nil {
-                refreshTokenTask = _Concurrency.Task {
-                    defer { refreshTokenTask = nil }
+            if refreshAuthTask == nil {
+                refreshAuthTask = _Concurrency.Task {
+                    defer { refreshAuthTask = nil }
                     
                     let attempts: Int = 1
                     var lastError: Error?
                     
                     for attempt in 1...attempts {
-                        let logText = "NetworkService. RefreshToken request started with attempt number \(attempt)"
-                        Log.refreshTokenFlow.debug(logEntry: .text(logText))
+                        let logText = "NetworkService. AuthRefresh request started with attempt number \(attempt)"
+                        Log.authRefreshFlow.debug(logEntry: .text(logText))
                         
                         do {
-                            _ = try await tokenRefreshProvider.cookie()
+                            _ = try await authRefreshProvider.authorizeUser()
                             
-                            Log.refreshTokenFlow.debug(logEntry: .text("NetworkService. RefreshToken updated"))
+                            Log.authRefreshFlow.debug(logEntry: .text("NetworkService. AuthRefresh updated"))
 
                             lastError = nil
                             
@@ -151,9 +176,8 @@ private extension BaseNetworkService {
                 }
             }
             
-            return try await refreshTokenTask!.value
+            return try await refreshAuthTask!.value
         }
-        // swiftlint:enable force_unwrapping
     }
     
     actor OnceExecutor {
