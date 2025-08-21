@@ -18,19 +18,11 @@
 			remoteGlobalIDString = 950A8F3F2E4C47BE00ABDA89;
 			remoteInfo = qBittorrentMobileClient;
 		};
-		950A8F582E4C47BF00ABDA89 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 950A8F382E4C47BE00ABDA89 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 950A8F3F2E4C47BE00ABDA89;
-			remoteInfo = qBittorrentMobileClient;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		950A8F402E4C47BE00ABDA89 /* qBittorrentMobileClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = qBittorrentMobileClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		950A8F4D2E4C47BF00ABDA89 /* qBittorrentMobileClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qBittorrentMobileClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		950A8F572E4C47BF00ABDA89 /* qBittorrentMobileClientUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qBittorrentMobileClientUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -43,11 +35,22 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		4C9137302E570EC6009BD470 /* Exceptions for "qBittorrentMobileClient" folder in "Compile Sources" phase from "qBittorrentMobileClient" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 950A8F3C2E4C47BE00ABDA89 /* Sources */;
+			membershipExceptions = (
+				Mock/JSONTorrents.json,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		950A8F422E4C47BE00ABDA89 /* qBittorrentMobileClient */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				950A8FB72E4C5BAD00ABDA89 /* Exceptions for "qBittorrentMobileClient" folder in "qBittorrentMobileClient" target */,
+				4C9137302E570EC6009BD470 /* Exceptions for "qBittorrentMobileClient" folder in "Compile Sources" phase from "qBittorrentMobileClient" target */,
 			);
 			path = qBittorrentMobileClient;
 			sourceTree = "<group>";
@@ -55,11 +58,6 @@
 		950A8F502E4C47BF00ABDA89 /* qBittorrentMobileClientTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = qBittorrentMobileClientTests;
-			sourceTree = "<group>";
-		};
-		950A8F5A2E4C47BF00ABDA89 /* qBittorrentMobileClientUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = qBittorrentMobileClientUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -80,13 +78,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		950A8F542E4C47BF00ABDA89 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -95,7 +86,6 @@
 			children = (
 				950A8F422E4C47BE00ABDA89 /* qBittorrentMobileClient */,
 				950A8F502E4C47BF00ABDA89 /* qBittorrentMobileClientTests */,
-				950A8F5A2E4C47BF00ABDA89 /* qBittorrentMobileClientUITests */,
 				950A8F412E4C47BE00ABDA89 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -105,7 +95,6 @@
 			children = (
 				950A8F402E4C47BE00ABDA89 /* qBittorrentMobileClient.app */,
 				950A8F4D2E4C47BF00ABDA89 /* qBittorrentMobileClientTests.xctest */,
-				950A8F572E4C47BF00ABDA89 /* qBittorrentMobileClientUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -159,29 +148,6 @@
 			productReference = 950A8F4D2E4C47BF00ABDA89 /* qBittorrentMobileClientTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		950A8F562E4C47BF00ABDA89 /* qBittorrentMobileClientUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 950A8F672E4C47BF00ABDA89 /* Build configuration list for PBXNativeTarget "qBittorrentMobileClientUITests" */;
-			buildPhases = (
-				950A8F532E4C47BF00ABDA89 /* Sources */,
-				950A8F542E4C47BF00ABDA89 /* Frameworks */,
-				950A8F552E4C47BF00ABDA89 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				950A8F592E4C47BF00ABDA89 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				950A8F5A2E4C47BF00ABDA89 /* qBittorrentMobileClientUITests */,
-			);
-			name = qBittorrentMobileClientUITests;
-			packageProductDependencies = (
-			);
-			productName = qBittorrentMobileClientUITests;
-			productReference = 950A8F572E4C47BF00ABDA89 /* qBittorrentMobileClientUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -196,10 +162,6 @@
 						CreatedOnToolsVersion = 16.4;
 					};
 					950A8F4C2E4C47BF00ABDA89 = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 950A8F3F2E4C47BE00ABDA89;
-					};
-					950A8F562E4C47BF00ABDA89 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 950A8F3F2E4C47BE00ABDA89;
 					};
@@ -224,7 +186,6 @@
 			targets = (
 				950A8F3F2E4C47BE00ABDA89 /* qBittorrentMobileClient */,
 				950A8F4C2E4C47BF00ABDA89 /* qBittorrentMobileClientTests */,
-				950A8F562E4C47BF00ABDA89 /* qBittorrentMobileClientUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -238,13 +199,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		950A8F4B2E4C47BF00ABDA89 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		950A8F552E4C47BF00ABDA89 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -268,13 +222,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		950A8F532E4C47BF00ABDA89 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -282,11 +229,6 @@
 			isa = PBXTargetDependency;
 			target = 950A8F3F2E4C47BE00ABDA89 /* qBittorrentMobileClient */;
 			targetProxy = 950A8F4E2E4C47BF00ABDA89 /* PBXContainerItemProxy */;
-		};
-		950A8F592E4C47BF00ABDA89 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 950A8F3F2E4C47BE00ABDA89 /* qBittorrentMobileClient */;
-			targetProxy = 950A8F582E4C47BF00ABDA89 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -512,40 +454,6 @@
 			};
 			name = Release;
 		};
-		950A8F682E4C47BF00ABDA89 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SM6SUDPAYJ;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = denisdmitriev.qBittorrentMobileClientUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = qBittorrentMobileClient;
-			};
-			name = Debug;
-		};
-		950A8F692E4C47BF00ABDA89 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SM6SUDPAYJ;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = denisdmitriev.qBittorrentMobileClientUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = qBittorrentMobileClient;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -572,15 +480,6 @@
 			buildConfigurations = (
 				950A8F652E4C47BF00ABDA89 /* Debug */,
 				950A8F662E4C47BF00ABDA89 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		950A8F672E4C47BF00ABDA89 /* Build configuration list for PBXNativeTarget "qBittorrentMobileClientUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				950A8F682E4C47BF00ABDA89 /* Debug */,
-				950A8F692E4C47BF00ABDA89 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

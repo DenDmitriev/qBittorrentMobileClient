@@ -14,7 +14,8 @@ extension AuthApi: MobileApiTargetType {
     var formData: [MultipartFormData] { getFormData() }
     var headers: [String: String]? { getHeaders() }
     
-    private func getBaseURL() -> URL { URL(string: "http://192.168.31.33:8080")! }
+//    private func getBaseURL() -> URL { URL(string: "http://192.168.31.33:8080")! }
+    private func getBaseURL() -> URL { URL(string: "http://10.147.20.215:8080")! }
     
     private func getPath() -> String {
         switch self {
@@ -35,7 +36,7 @@ extension AuthApi: MobileApiTargetType {
     private func getTask() -> Moya.Task {
         switch self {
         case .login:
-            return .uploadMultipart(getFormData())
+            return .uploadMultipart(formData)
         case .logout:
             return .requestPlain
         }

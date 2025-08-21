@@ -9,10 +9,20 @@ import Foundation
 
 class AuthRepository: AuthRefreshProvider {
     var username: String? {
-        didSet { UserDefaults.standard.string(forKey: AppStorageKeys.username) }
+        get {
+            UserDefaults.standard.string(forKey: AppStorageKeys.username)
+        }
+        set(newValue) {
+            UserDefaults.standard.set(newValue, forKey: AppStorageKeys.username)
+        }
     }
     var password: String? {
-        didSet { UserDefaults.standard.string(forKey: AppStorageKeys.password) }
+        get {
+            UserDefaults.standard.string(forKey: AppStorageKeys.password)
+        }
+        set(newValue) {
+            UserDefaults.standard.set(newValue, forKey: AppStorageKeys.password)
+        }
     }
         
     private lazy var mobileService = MobileService.shared

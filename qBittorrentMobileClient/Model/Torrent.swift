@@ -46,7 +46,7 @@ struct Torrent: Codable, Hashable, Identifiable {
     let seenComplete: Int
     let seqDl: Bool
     let size: Int64
-    let state: String
+    let state: TorrentState
     let superSeeding: Bool
     let tags: String
     let timeActive: Int
@@ -116,6 +116,88 @@ struct Torrent: Codable, Hashable, Identifiable {
 }
 
 extension Torrent {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        addedOn = try container.decode(Int.self, forKey: .addedOn)
+        amountLeft = try container.decode(Int64.self, forKey: .amountLeft)
+        autoTmm = try container.decode(Bool.self, forKey: .autoTmm)
+        availability = try container.decode(Double.self, forKey: .availability)
+        category = try container.decode(String.self, forKey: .category)
+        completed = try container.decode(Int64.self, forKey: .completed)
+        completionOn = try container.decode(Int.self, forKey: .completionOn)
+        contentPath = try container.decode(String.self, forKey: .contentPath)
+        dlLimit = try container.decode(Int.self, forKey: .dlLimit)
+        dlspeed = try container.decode(Int.self, forKey: .dlspeed)
+        downloadPath = try container.decode(String.self, forKey: .downloadPath)
+        downloaded = try container.decode(Int64.self, forKey: .downloaded)
+        downloadedSession = try container.decode(Int64.self, forKey: .downloadedSession)
+        eta = try container.decode(Int.self, forKey: .eta)
+        fLPiecePrio = try container.decode(Bool.self, forKey: .fLPiecePrio)
+        forceStart = try container.decode(Bool.self, forKey: .forceStart)
+        hash = try container.decode(String.self, forKey: .hash)
+        infohashV1 = try container.decode(String.self, forKey: .infohashV1)
+        infohashV2 = try container.decode(String.self, forKey: .infohashV2)
+        lastActivity = try container.decode(Int.self, forKey: .lastActivity)
+        magnetUri = try container.decode(String.self, forKey: .magnetUri)
+        maxRatio = try container.decode(Double.self, forKey: .maxRatio)
+        maxSeedingTime = try container.decode(Int.self, forKey: .maxSeedingTime)
+        name = try container.decode(String.self, forKey: .name)
+        numComplete = try container.decode(Int.self, forKey: .numComplete)
+        numIncomplete = try container.decode(Int.self, forKey: .numIncomplete)
+        numLeechs = try container.decode(Int.self, forKey: .numLeechs)
+        numSeeds = try container.decode(Int.self, forKey: .numSeeds)
+        priority = try container.decode(Int.self, forKey: .priority)
+        progress = try container.decode(Double.self, forKey: .progress)
+        ratio = try container.decode(Double.self, forKey: .ratio)
+        ratioLimit = try container.decode(Double.self, forKey: .ratioLimit)
+        savePath = try container.decode(String.self, forKey: .savePath)
+        seedingTime = try container.decode(Int.self, forKey: .seedingTime)
+        seedingTimeLimit = try container.decode(Int.self, forKey: .seedingTimeLimit)
+        seenComplete = try container.decode(Int.self, forKey: .seenComplete)
+        seqDl = try container.decode(Bool.self, forKey: .seqDl)
+        size = try container.decode(Int64.self, forKey: .size)
+        superSeeding = try container.decode(Bool.self, forKey: .superSeeding)
+        tags = try container.decode(String.self, forKey: .tags)
+        timeActive = try container.decode(Int.self, forKey: .timeActive)
+        totalSize = try container.decode(Int64.self, forKey: .totalSize)
+        tracker = try container.decode(String.self, forKey: .tracker)
+        trackersCount = try container.decode(Int.self, forKey: .trackersCount)
+        upLimit = try container.decode(Int.self, forKey: .upLimit)
+        uploaded = try container.decode(Int64.self, forKey: .uploaded)
+        uploadedSession = try container.decode(Int64.self, forKey: .uploadedSession)
+        upspeed = try container.decode(Int.self, forKey: .upspeed)
+        
+        // Декодирование строки состояния и преобразование в TorrentState
+        let stateString = try container.decode(String.self, forKey: .state)
+        switch stateString {
+        case "downloading", "metaDL", "stalledDL", "forcedDL":
+            state = .downloading
+        case "pausedDL":
+            state = .paused
+        case "queuedDL":
+            state = .queued
+        case "checkingDL", "checkingResumeData", "checkingUP":
+            state = .checking
+        case "uploading", "forcedUP", "stalledUP":
+            state = .seeding
+        case "pausedUP", "queuedUP":
+            state = .pausedSeeding
+        case "error":
+            state = .error
+        case "missingFiles":
+            state = .missingFiles
+        case "allocating":
+            state = .allocating
+        case "moving":
+            state = .moving
+        default:
+            state = .unknown
+        }
+    }
+}
+
+extension Torrent {
     static let placeholder: Self = .init(
         addedOn: 1754685932,
         amountLeft: 19243466752,
@@ -155,7 +237,7 @@ extension Torrent {
         seenComplete: 1754688672,
         seqDl: false,
         size: 37627101184,
-        state: "pausedDL",
+        state: .pausedSeeding,
         superSeeding: false,
         tags: "",
         timeActive: 75035,
@@ -167,4 +249,18 @@ extension Torrent {
         uploadedSession: 0,
         upspeed: 0
     )
+}
+
+extension Array<Torrent> {
+    static var placeholder: Self = {
+        guard
+            let url = Bundle.main.url(forResource: "JSONTorrents", withExtension: "json"),
+            let data = try? Data(contentsOf: url),
+            let torrents = try? JSONDecoder().decode([Torrent].self, from: data)
+        else {
+            return []
+        }
+        
+        return torrents
+    }()
 }

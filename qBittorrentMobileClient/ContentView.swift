@@ -8,13 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isAuthorizationPresented: Bool = true
+    private let authRepository = AuthRepository()
+    @State private var isAuthorized: Bool?
     
     var body: some View {
-        ConnectTestView()
-            .sheet(isPresented: $isAuthorizationPresented) {
-                AuthView(isPresented: $isAuthorizationPresented)
+        Group {
+            if isAuthorized == nil {
+                LaunchView()
+            } else if let isAuthorized, isAuthorized == false {
+                AuthView(isAuthorized: $isAuthorized)
+            } else {
+                TorrentsView()
             }
+        }
+        .task {
+            await login()
+        }
+    }
+    
+    private func login() async {
+        do {
+            let isAuthorized = try await authRepository.authorizeUser()
+            await MainActor.run {
+                self.isAuthorized = isAuthorized
+            }
+        } catch {
+            await MainActor.run {
+                self.isAuthorized = false
+            }
+        }
     }
 }
 

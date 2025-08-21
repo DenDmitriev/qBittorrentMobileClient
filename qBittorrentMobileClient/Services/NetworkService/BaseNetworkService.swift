@@ -108,7 +108,7 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
     
     private func authRefresh() async throws {
         do {
-            try await authRefresher.refreshToken()
+            try await authRefresher.refreshAuth()
         } catch let error {
             try _Concurrency.Task.checkCancellation()
             
@@ -136,6 +136,7 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
 
 private extension BaseNetworkService {
     actor AuthRefresher {
+        var isAuthorized: Bool = false
         private let authRefreshProvider: AuthRefreshProvider
         private var refreshAuthTask: _Concurrency.Task<Void, Error>?
                 
@@ -143,7 +144,7 @@ private extension BaseNetworkService {
             self.authRefreshProvider = authRefreshProvider
         }
 
-        func refreshToken() async throws {
+        func refreshAuth() async throws {
             Log.authRefreshFlow.debug(logEntry: .text("NetworkService. AuthRefresh method called"))
             
             if refreshAuthTask == nil {
@@ -158,7 +159,7 @@ private extension BaseNetworkService {
                         Log.authRefreshFlow.debug(logEntry: .text(logText))
                         
                         do {
-                            _ = try await authRefreshProvider.authorizeUser()
+                            isAuthorized = try await authRefreshProvider.authorizeUser()
                             
                             Log.authRefreshFlow.debug(logEntry: .text("NetworkService. AuthRefresh updated"))
 
@@ -166,6 +167,7 @@ private extension BaseNetworkService {
                             
                             break
                         } catch {
+                            isAuthorized = false
                             lastError = error
                         }
                     }

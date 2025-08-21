@@ -20,7 +20,8 @@ final class StateFlow<T: Codable & Hashable & Sendable>: ObservableObject {
     private var fetch: (() async throws -> T)?
     private var isFlowPaused: Bool = false
     
-    init() {
+    init(value: T? = nil) {
+        wrappedValue = value
         startStateFlow()
     }
     

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @Binding var isPresented: Bool
+    @Binding var isAuthorized: Bool?
     
     private let authRepository = AuthRepository()
     @AppStorage(AppStorageKeys.username) private var username: String = ""
@@ -41,12 +41,12 @@ struct AuthView: View {
         Task {
             let isAuthorized = try await authRepository.authorizeUser(username: username, password: password)
             await MainActor.run {
-                self.isPresented = !isAuthorized
+                self.isAuthorized = isAuthorized
             }
         }
     }
 }
 
 #Preview {
-    AuthView(isPresented: .constant(false))
+    AuthView(isAuthorized: .constant(false))
 }
