@@ -8,38 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
-    private let authRepository = AuthRepository()
-    @State private var isAuthorized: Bool?
+    @Environment(AuthRepository.self) private var authRepository
     
     var body: some View {
-        Group {
-            if isAuthorized == nil {
-                LaunchView()
-            } else if let isAuthorized, isAuthorized == false {
-                AuthView(isAuthorized: $isAuthorized)
-            } else {
-                TorrentsView()
+        MainTabView()
+            .fullScreenCover(isPresented: isAuthorizationPresented) {
+                AuthView()
             }
-        }
-        .task {
-            await login()
-        }
+            .environment(authRepository)
     }
     
-    private func login() async {
-        do {
-            let isAuthorized = try await authRepository.authorizeUser()
-            await MainActor.run {
-                self.isAuthorized = isAuthorized
+    private var isAuthorizationPresented: Binding<Bool> { Binding(
+        get: {
+            guard let isAuthorized = authRepository.isAuthorized else {
+                return false
             }
-        } catch {
-            await MainActor.run {
-                self.isAuthorized = false
-            }
-        }
+            return !isAuthorized
+        },
+        set: { _ in })
     }
 }
 
 #Preview {
     ContentView()
+        .environment(AuthRepository())
 }

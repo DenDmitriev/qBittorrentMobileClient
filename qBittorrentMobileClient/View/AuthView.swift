@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct AuthView: View {
-    @Binding var isAuthorized: Bool?
-    
-    private let authRepository = AuthRepository()
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AuthRepository.self) private var authRepository
     @AppStorage(AppStorageKeys.username) private var username: String = ""
     @AppStorage(AppStorageKeys.password) private var password: String = ""
     
@@ -20,12 +19,14 @@ struct AuthView: View {
                 Image(.qbittorrentLogo)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 50)
-                Text("Authorization")
-                    .font(.title)
-                TextField("Username", text: $username)
-                    .textInputAutocapitalization(.never)
-                SecureField("Password", text: $password)
+                    .frame(width: 100)
+                VStack {
+                    Text("Authorization")
+                        .font(.title)
+                    TextField("Username", text: $username)
+                        .textInputAutocapitalization(.never)
+                    SecureField("Password", text: $password)
+                }
             }
             .padding()
             .toolbar {
@@ -41,12 +42,15 @@ struct AuthView: View {
         Task {
             let isAuthorized = try await authRepository.authorizeUser(username: username, password: password)
             await MainActor.run {
-                self.isAuthorized = isAuthorized
+                if isAuthorized {
+                    dismiss()
+                }
             }
         }
     }
 }
 
 #Preview {
-    AuthView(isAuthorized: .constant(false))
+    AuthView()
+        .environment(AuthRepository())
 }

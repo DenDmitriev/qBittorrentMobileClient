@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TorrentsView: View {
     @StateObject @StateFlow var torrents: [Torrent]?
-    let authRepository = AuthRepository()
     private let torrentRepository: TorrentRepository = .init()
     
     init(torrents: [Torrent]? = nil) {
@@ -32,10 +31,23 @@ struct TorrentsView: View {
                 Text("Пусто")
             }
         }
-        .onAppear {
-            _torrents.wrappedValue.setFetch {
-                try await torrentRepository.getTorrentsInfo()
+        .navigationTitle(String(localized: "Torrents"))
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                ServerStatusIcon(error: $torrents.error)
             }
+        }
+        .onAppear {
+            if _torrents.wrappedValue.wrappedValue == nil {
+                _torrents.wrappedValue.setFetch {
+                    try await torrentRepository.getTorrentsInfo()
+                }
+            } else {
+                _torrents.wrappedValue.resumeFlow()
+            }
+        }
+        .onDisappear {
+            _torrents.wrappedValue.pauseFlow()
         }
     }
 }

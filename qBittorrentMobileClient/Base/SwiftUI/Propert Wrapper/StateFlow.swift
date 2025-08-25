@@ -11,7 +11,7 @@ import Combine
 @propertyWrapper
 final class StateFlow<T: Codable & Hashable & Sendable>: ObservableObject {
     @Published var wrappedValue: T?
-    @Published private var error: Error?
+    @Published var error: Error?
     
     var projectedValue: Published<T?>.Publisher { $wrappedValue }
     var errorPublisher: Published<Error?>.Publisher { $error }

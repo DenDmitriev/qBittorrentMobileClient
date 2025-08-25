@@ -13,7 +13,7 @@ class MobileService: BaseNetworkService<MobileApi> {
     static let shared = MobileService()
         
     private init() {
-        let authProvider = AuthRepository()
+        let authRefresher = AuthRefresher()
         
         let stubClosure = { (target: MobileApi) -> Moya.StubBehavior in
             return .never
@@ -27,7 +27,7 @@ class MobileService: BaseNetworkService<MobileApi> {
                 
         super.init(
             apiProvider: apiProvider,
-            authRefreshProvider: authProvider
+            authRefreshProvider: authRefresher
         )
     }
     

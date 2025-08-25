@@ -6,7 +6,7 @@ typealias MoyaProvider = Moya.MoyaProvider
 protocol NetworkService {
     associatedtype Target: MobileApiTargetType
     
-    var onAuthRefreshFailed: (() -> Void)? { get set }
+    var onAuthRefreshCompletion: ((Bool) -> Void)? { get set }
     
     func request<T: Decodable>(target: Target) async throws -> T
     func request(target: Target) async throws
@@ -20,7 +20,7 @@ protocol AuthRefreshProvider {
 }
 
 class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
-    var onAuthRefreshFailed: (() -> Void)? { didSet { onceExecutor = OnceExecutor() } }
+    var onAuthRefreshCompletion: ((Bool) -> Void)? { didSet { onceExecutor = OnceExecutor() } }
     
     private let apiProvider: MoyaProvider<Target>
     private let authRefresher: AuthRefresher
@@ -42,14 +42,16 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
         } catch {
             try _Concurrency.Task.checkCancellation()
             
-            if
-                let serverError = error as? ServerError,
-                case .unauthorized = serverError
-            {
+            guard let serverError = error as? ServerError else {
+                throw ServerError.systemError(details: .init(message: "Unknown error occurred"))
+            }
+            
+            switch serverError {
+            case .unauthorized, .forbidden:
                 try await authRefresh()
                 Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
                 return try await apiProvider.request(target: target)
-            } else {
+            default:
                 let logText = "NetworkService. Request \(target) failed with error \(error)"
                 Log.authRefreshFlow.debug(logEntry: .text(logText))
                 
@@ -66,14 +68,16 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
         } catch {
             try _Concurrency.Task.checkCancellation()
             
-            if
-                let serverError = error as? ServerError,
-                case .unauthorized = serverError
-            {
+            guard let serverError = error as? ServerError else {
+                throw ServerError.systemError(details: .init(message: "Unknown error occurred"))
+            }
+            
+            switch serverError {
+            case .unauthorized, .forbidden:
                 try await authRefresh()
                 Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
                 return try await apiProvider.request(target: target)
-            } else {
+            default:
                 let logText = "NetworkService. Request \(target) failed with error \(error)"
                 Log.authRefreshFlow.debug(logEntry: .text(logText))
                 
@@ -90,14 +94,16 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
         } catch {
             try _Concurrency.Task.checkCancellation()
             
-            if
-                let serverError = error as? ServerError,
-                case .forbidden = serverError
-            {
+            guard let serverError = error as? ServerError else {
+                throw ServerError.systemError(details: .init(message: "Unknown error occurred"))
+            }
+            
+            switch serverError {
+            case .unauthorized, .forbidden:
                 try await authRefresh()
                 Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Request \(target) started"))
                 return try await apiProvider.request(target: target)
-            } else {
+            default:
                 let logText = "NetworkService. Request \(target) failed with error \(error)"
                 Log.authRefreshFlow.debug(logEntry: .text(logText))
                 
@@ -109,21 +115,14 @@ class BaseNetworkService<Target: MobileApiTargetType>: NetworkService {
     private func authRefresh() async throws {
         do {
             try await authRefresher.refreshAuth()
+            await onAuthRefreshCompletion?(authRefresher.isAuthorized)
         } catch let error {
             try _Concurrency.Task.checkCancellation()
             
             if let serverError = error as? ServerError,
-               case .forbidden = serverError {
+               case .unauthorized = serverError {
                 await onceExecutor?.runOnce { [weak self] in
-                    self?.onAuthRefreshFailed?()
-                    Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Send onAuthRefreshFailed"))
-                }
-            }
-            
-            if let serverError = error as? ServerError,
-               case .tokenExpired = serverError {
-                await onceExecutor?.runOnce { [weak self] in
-                    self?.onAuthRefreshFailed?()
+                    self?.onAuthRefreshCompletion?(false)
                     Log.authRefreshFlow.debug(logEntry: .text("NetworkService. Send onAuthRefreshFailed"))
                 }
             }
