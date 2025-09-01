@@ -30,4 +30,20 @@ class TorrentRepository {
     func recheckTorrent(id: Torrent.ID) async throws {
         try await mobileService.request(target: .torrent(.recheck(id: id)))
     }
+    
+    func getTorrentContent(id: Torrent.ID) async throws -> [TorrentContent] {
+        return try await mobileService.request(target: .torrent(.getTorrentContents(id: id)))
+    }
+    
+    func addTorrent(url: URL, paused: Bool, loadSequentially: Bool) async throws {
+        try await mobileService.request(target: .torrent(.addTorrent(url: url, paused: paused, loadSequentially: loadSequentially)))
+    }
+    
+    func addTorrent(file: URL, paused: Bool, loadSequentially: Bool) async throws {
+        try await mobileService.request(target: .torrent(.addTorrentFile(url: file, paused: paused, loadSequentially: loadSequentially)))
+    }
+    
+    func setFilePriority(torrentId: Torrent.ID, fileId: TorrentContent.ID, priority: TorrentPriority) async throws {
+        try await mobileService.request(target: .torrent(.setFilePriority(torrentId: torrentId, fileId: fileId, priority: priority)))
+    }
 }

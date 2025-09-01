@@ -9,7 +9,8 @@ import SwiftUI
 
 struct TorrentsView: View {
     @StateObject @StateFlow var torrents: [Torrent]?
-    private let torrentRepository: TorrentRepository = .init()
+    @Environment(TorrentRepository.self) private var torrentRepository
+    @State private var isAddTorrentPresented = false
     
     init(torrents: [Torrent]? = nil) {
         self._torrents = .init(wrappedValue: .init(value: torrents))
@@ -21,20 +22,31 @@ struct TorrentsView: View {
                 ScrollView {
                     LazyVStack(spacing: 20) {
                         ForEach(torrents) { torrent in
-                            TorrentItemView(torrent: torrent)
+                            NavigationLink(value: Router.torrentContent(torrent: torrent)) {
+                                TorrentItemView(torrent: torrent)
+                            }
+                            .tint(Color.primary)
                         }
                     }
                     .padding()
                 }
-                .environment(torrentRepository)
             } else {
                 Text("Пусто")
             }
         }
+        .sheet(isPresented: $isAddTorrentPresented) {
+            AddTorrentView()
+        }
+        .environment(torrentRepository)
         .navigationTitle(String(localized: "Torrents"))
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 ServerStatusIcon(error: $torrents.error)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(String(localized: "Add Torrent"), systemImage: "plus.circle.fill", action: showAddTorrentSheet)
             }
         }
         .onAppear {
@@ -50,8 +62,15 @@ struct TorrentsView: View {
             _torrents.wrappedValue.pauseFlow()
         }
     }
+    
+    private func showAddTorrentSheet() {
+        isAddTorrentPresented = true
+    }
 }
 
 #Preview {
-    TorrentsView(torrents: .placeholder)
+    NavigationStack {
+        TorrentsView(torrents: .placeholder)
+    }
+    .environment(TorrentRepository())
 }

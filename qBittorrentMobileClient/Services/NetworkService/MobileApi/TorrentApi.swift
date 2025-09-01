@@ -14,31 +14,38 @@ enum TorrentApi {
     case resume(id: Torrent.ID)
     case forceStart(id: Torrent.ID)
     case recheck(id: Torrent.ID)
+    case getTorrentContents(id: Torrent.ID)
+    case addTorrent(url: URL, paused: Bool, loadSequentially: Bool)
+    case addTorrentFile(url: URL, paused: Bool, loadSequentially: Bool)
+    case setFilePriority(torrentId: Torrent.ID, fileId: TorrentContent.ID, priority: TorrentPriority)
 }
 
-extension TorrentApi: MobileApiTargetType {
-    var baseURL: URL { getBaseURL() }
+extension TorrentApi: MobileApiTargetType, TorrentServer {
+    var baseURL: URL { serverURL }
     var path: String { getPath() }
     var method: Moya.Method { getMethod() }
     var task: Moya.Task { getTask() }
     var formData: [MultipartFormData] { getFormData() }
     var headers: [String: String]? { getHeaders() }
     
-    private func getBaseURL() -> URL { URL(string: "http://192.168.31.33:8080")! }
-//    private func getBaseURL() -> URL { URL(string: "http://10.147.20.215:8080")! }
-    
     private func getPath() -> String {
         switch self {
         case .getTorrentsInfo:
             return "/api/v2/torrents/info"
-        case .pause(let id):
+        case .pause:
             return "/api/v2/torrents/pause"
-        case .resume(let id):
+        case .resume:
             return "/api/v2/torrents/resume"
-        case .forceStart(let id):
+        case .forceStart:
             return "/api/v2/torrents/setForceStart"
-        case .recheck(let id):
+        case .recheck:
             return "/api/v2/torrents/recheck"
+        case .getTorrentContents:
+            return "/api/v2/torrents/files"
+        case .addTorrent, .addTorrentFile:
+            return "/api/v2/torrents/add"
+        case .setFilePriority:
+            return "/api/v2/torrents/filePrio"
         }
     }
     
@@ -46,7 +53,7 @@ extension TorrentApi: MobileApiTargetType {
         switch self {
         case .getTorrentsInfo:
             return .get
-        case .pause, .resume, .forceStart, .recheck:
+        case .pause, .resume, .forceStart, .recheck, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
             return .post
         }
     }
@@ -55,7 +62,7 @@ extension TorrentApi: MobileApiTargetType {
         switch self {
         case .getTorrentsInfo:
             return .requestPlain
-        case .pause, .resume, .forceStart, .recheck:
+        case .pause, .resume, .forceStart, .recheck, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
             return .uploadMultipart(formData)
         }
     }
@@ -71,7 +78,27 @@ extension TorrentApi: MobileApiTargetType {
         case .forceStart(let id):
             multipartData.append(contentsOf: [
                 MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hashes"),
-                MultipartFormData(provider: .data(String("value").data(using: .utf8)!), name: "value")
+                MultipartFormData(provider: .data(String("true").data(using: .utf8)!), name: "value")
+            ])
+        case .getTorrentContents(let id):
+            multipartData.append(MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hash"))
+        case let .addTorrent(url, paused, loadSequentially):
+            multipartData.append(contentsOf: [
+                MultipartFormData(provider: .data(url.absoluteString.data(using: .utf8)!), name: "urls"),
+                MultipartFormData(provider: .data(String(paused).data(using: .utf8)!), name: "paused"),
+                MultipartFormData(provider: .data(String(loadSequentially).data(using: .utf8)!), name: "sequentialDownload")
+            ])
+        case let .addTorrentFile(url, paused, loadSequentially):
+            multipartData.append(contentsOf: [
+                MultipartFormData(provider: .file(url), name: "torrents", fileName: url.lastPathComponent, mimeType: "application/x-bittorrent"),
+                MultipartFormData(provider: .data(String(paused).data(using: .utf8)!), name: "paused"),
+                MultipartFormData(provider: .data(String(loadSequentially).data(using: .utf8)!), name: "sequentialDownload")
+            ])
+        case let .setFilePriority(torrentId, fileId,  priority):
+            multipartData.append(contentsOf: [
+                MultipartFormData(provider: .data(torrentId.data(using: .utf8)!), name: "hash"),
+                MultipartFormData(provider: .data(String(fileId).data(using: .utf8)!), name: "id"),
+                MultipartFormData(provider: .data(String(priority.rawValue).data(using: .utf8)!), name: "priority")
             ])
         }
         
@@ -79,9 +106,6 @@ extension TorrentApi: MobileApiTargetType {
     }
     
     private func getHeaders() -> [String: String]? {
-        switch self {
-        case .getTorrentsInfo, .pause, .resume, .recheck, .forceStart:
-            return [:]
-        }
+        return nil
     }
 }

@@ -53,10 +53,7 @@ extension MobileApi: MobileApiTargetType {
     }
 
     private func getHeaders() -> [String: String]? {
-        var headers = [
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        ]
+        var headers: [String: String] = [:]
         
         let additionalHeaders: [String: String]?
         

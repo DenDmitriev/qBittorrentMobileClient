@@ -12,6 +12,27 @@ enum TorrentAction {
     case resume
     case forceStart
     case recheck
+    
+    /*
+    func isSome(state: TorrentState) -> Bool {
+        switch (self, state) {
+        case (.pause, .paused):
+            return true
+        case (.pause, .pausedSeeding):
+            return true
+        case (.resume, .downloading):
+            return true
+        case (.resume, .seeding):
+            return true
+        case (.forceStart, .downloading):
+            return true
+        case (.recheck, .checking):
+            return true
+        default:
+            return false
+        }
+    }
+     */
 }
 
 struct DownloadButton: View {
@@ -110,58 +131,6 @@ struct DownloadButton: View {
         default:
             return false
         }
-    }
-    
-    private func pauseTorrent() {
-//        let url = "\(apiBaseUrl)/torrents/pause"
-//        let parameters: [String: String] = ["hashes": torrentHash]
-//        let headers: HTTPHeaders = ["Cookie": "SID=\(sid)"]
-//        
-//        AF.request(url, method: .post, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: headers)
-//            .response { response in
-//                if case .failure(let error) = response.result {
-//                    print("Failed to pause torrent: \(error)")
-//                }
-//            }
-    }
-    
-    private func resumeTorrent() {
-//        let url = "\(apiBaseUrl)/torrents/resume"
-//        let parameters: [String: String] = ["hashes": torrentHash]
-//        let headers: HTTPHeaders = ["Cookie": "SID=\(sid)"]
-//        
-//        AF.request(url, method: .post, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: headers)
-//            .response { response in
-//                if case .failure(let error) = response.result {
-//                    print("Failed to resume torrent: \(error)")
-//                }
-//            }
-    }
-    
-    private func forceStartTorrent() {
-//        let url = "\(apiBaseUrl)/torrents/setForceStart"
-//        let parameters: [String: String] = ["hashes": torrentHash, "value": "true"]
-//        let headers: HTTPHeaders = ["Cookie": "SID=\(sid)"]
-//        
-//        AF.request(url, method: .post, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: headers)
-//            .response { response in
-//                if case .failure(let error) = response.result {
-//                    print("Failed to force start torrent: \(error)")
-//                }
-//            }
-    }
-    
-    private func recheckTorrent() {
-//        let url = "\(apiBaseUrl)/torrents/recheck"
-//        let parameters: [String: String] = ["hashes": torrentHash]
-//        let headers: HTTPHeaders = ["Cookie": "SID=\(sid)"]
-//        
-//        AF.request(url, method: .post, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: headers)
-//            .response { response in
-//                if case .failure(let error) = response.result {
-//                    print("Failed to recheck torrent: \(error)")
-//                }
-//            }
     }
 }
 

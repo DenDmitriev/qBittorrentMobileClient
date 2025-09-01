@@ -208,7 +208,7 @@ extension Torrent {
         completionOn: -10800,
         contentPath: "/mnt/ssd/The Godfather Collection",
         dlLimit: 0,
-        dlspeed: 0,
+        dlspeed: 588365,
         downloadPath: "",
         downloaded: 19500990734,
         downloadedSession: 19500990734,
@@ -249,6 +249,20 @@ extension Torrent {
         uploadedSession: 0,
         upspeed: 0
     )
+}
+
+extension Torrent {
+    var remainingSize: Int64 {
+        Int64(Double(size) * (1.0 - progress))
+    }
+    
+    func remainingTime(dlspeed: Int) -> TimeInterval {
+        guard dlspeed > 0 else {
+            return 0
+        }
+        
+        return TimeInterval(remainingSize) / TimeInterval(dlspeed)
+    }
 }
 
 extension Array<Torrent> {

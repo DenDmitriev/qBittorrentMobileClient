@@ -10,4 +10,5 @@ import Foundation
 enum AppStorageKeys {
     static let username = "Username"
     static let password = "Password"
+    static let serverUrl = "serverUrl"
 }

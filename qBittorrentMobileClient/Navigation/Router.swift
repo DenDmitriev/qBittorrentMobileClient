@@ -9,6 +9,7 @@ import SwiftUI
 
 enum Router: Hashable {
     case torrents
+    case torrentContent(torrent: Torrent)
     case accountSettings
     case torrentSettings
     
@@ -16,6 +17,8 @@ enum Router: Hashable {
         switch route {
         case .torrents:
             TorrentsView()
+        case .torrentContent(let torrent):
+            TorrentContentView(torrent: torrent)
         case .accountSettings:
             AccountSettingsView()
         case .torrentSettings:

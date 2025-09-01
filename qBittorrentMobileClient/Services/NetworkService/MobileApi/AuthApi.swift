@@ -6,16 +6,13 @@ enum AuthApi {
     case logout
 }
 
-extension AuthApi: MobileApiTargetType {
-    var baseURL: URL { getBaseURL() }
+extension AuthApi: MobileApiTargetType, TorrentServer {
+    var baseURL: URL { serverURL }
     var path: String { getPath() }
     var method: Moya.Method { getMethod() }
     var task: Moya.Task { getTask() }
     var formData: [MultipartFormData] { getFormData() }
     var headers: [String: String]? { getHeaders() }
-    
-    private func getBaseURL() -> URL { URL(string: "http://192.168.31.33:8080")! }
-//    private func getBaseURL() -> URL { URL(string: "http://10.147.20.215:8080")! }
     
     private func getPath() -> String {
         switch self {
@@ -59,10 +56,6 @@ extension AuthApi: MobileApiTargetType {
     }
     
     private func getHeaders() -> [String: String]? {
-        switch self {
-        case .login,
-                .logout:
-            return [:]
-        }
+        return nil
     }
 }

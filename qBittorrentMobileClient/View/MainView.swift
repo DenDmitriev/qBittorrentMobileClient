@@ -10,8 +10,9 @@ import SwiftUI
 struct MainView: View {
     @Environment(AuthRepository.self) private var authRepository
     
+    @State private var torrentRepository: TorrentRepository = .init()
     @State private var navigationModel: NavigationModel = .init()
-    @State private var error: Error?
+    @State private var error: AppError?
     
     var body: some View {
         if authRepository.isAuthorized ?? false {
@@ -22,6 +23,7 @@ struct MainView: View {
                     }
             }
             .environment(navigationModel)
+            .environment(torrentRepository)
         } else {
             VStack {
                 ProgressView()
@@ -44,7 +46,15 @@ struct MainView: View {
                 try await authRepository.authorizeUser()
             } catch {
                 await MainActor.run {
-                    self.error = error
+                    if let error = error as? ServerError {
+                        if error.details.message.isEmpty == false {
+                            self.error = .some(message: error.details.message)
+                        } else if let error = error.details.error {
+                            self.error = .some(message: error.localizedDescription)
+                        }
+                    } else {
+                        self.error = .some(message: error.localizedDescription)
+                    }
                 }
             }
         }

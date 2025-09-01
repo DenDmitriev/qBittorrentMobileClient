@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthRepository.self) private var authRepository
+    @AppStorage(AppStorageKeys.serverUrl) private var serverUrl: URL?
     
     var body: some View {
         MainTabView()
@@ -20,8 +21,11 @@ struct ContentView: View {
     
     private var isAuthorizationPresented: Binding<Bool> { Binding(
         get: {
-            guard let isAuthorized = authRepository.isAuthorized else {
-                return false
+            guard
+                serverUrl != nil,
+                let isAuthorized = authRepository.isAuthorized
+            else {
+                return true
             }
             return !isAuthorized
         },
