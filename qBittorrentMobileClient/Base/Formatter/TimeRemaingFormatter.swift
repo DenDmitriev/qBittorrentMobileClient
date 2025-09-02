@@ -11,7 +11,7 @@ extension DateComponentsFormatter {
     static let timeRemaingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.unitsStyle = .abbreviated
+        formatter.unitsStyle = .positional
         return formatter
     }()
 }

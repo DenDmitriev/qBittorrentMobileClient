@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		950A8F952E4C488400ABDA89 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 950A8F942E4C488400ABDA89 /* Moya */; };
+		4CA0A2222E66BFB7001ED4D1 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 4CA0A2212E66BFB7001ED4D1 /* Moya */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				950A8F952E4C488400ABDA89 /* Moya in Frameworks */,
+				4CA0A2222E66BFB7001ED4D1 /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,7 +119,7 @@
 			);
 			name = qBittorrentMobileClient;
 			packageProductDependencies = (
-				950A8F942E4C488400ABDA89 /* Moya */,
+				4CA0A2212E66BFB7001ED4D1 /* Moya */,
 			);
 			productName = qBittorrentMobileClient;
 			productReference = 950A8F402E4C47BE00ABDA89 /* qBittorrentMobileClient.app */;
@@ -177,7 +177,7 @@
 			mainGroup = 950A8F372E4C47BE00ABDA89;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				950A8F932E4C488400ABDA89 /* XCRemoteSwiftPackageReference "Moya" */,
+				4CA0A2202E66BFB7001ED4D1 /* XCRemoteSwiftPackageReference "Moya" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 950A8F412E4C47BE00ABDA89 /* Products */;
@@ -487,7 +487,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		950A8F932E4C488400ABDA89 /* XCRemoteSwiftPackageReference "Moya" */ = {
+		4CA0A2202E66BFB7001ED4D1 /* XCRemoteSwiftPackageReference "Moya" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya.git";
 			requirement = {
@@ -498,9 +498,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		950A8F942E4C488400ABDA89 /* Moya */ = {
+		4CA0A2212E66BFB7001ED4D1 /* Moya */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 950A8F932E4C488400ABDA89 /* XCRemoteSwiftPackageReference "Moya" */;
+			package = 4CA0A2202E66BFB7001ED4D1 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
 		};
 /* End XCSwiftPackageProductDependency section */

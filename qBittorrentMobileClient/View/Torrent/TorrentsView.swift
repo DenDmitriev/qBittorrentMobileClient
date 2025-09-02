@@ -30,6 +30,7 @@ struct TorrentsView: View {
                     }
                     .padding()
                 }
+                .background(Color.backgroundSecond)
             } else {
                 Text("Пусто")
             }

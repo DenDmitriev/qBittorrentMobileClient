@@ -21,9 +21,9 @@ enum ServerError: Error {
     case notFound(details: ErrorDetails)
     
     /// statusCode: 409
-    case tokenExpired(details: ErrorDetails)
+    case torrentFailure(details: ErrorDetails)
     
-    /// statusCode: 422
+    /// statusCode: 415
     case notValid(details: ErrorDetails)
     
     /// statusCode: 429
@@ -57,7 +57,7 @@ enum ServerError: Error {
             return details
         case let .notFound(details):
             return details
-        case let .tokenExpired(details):
+        case let .torrentFailure(details):
             return details
         case let .notValid(details: details):
             return details

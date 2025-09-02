@@ -61,6 +61,7 @@ struct Torrent: Codable, Hashable, Identifiable {
     var id: String {
         hash
     }
+    let title: TorrentTitle
     
     enum CodingKeys: String, CodingKey {
         case addedOn = "added_on"
@@ -194,6 +195,8 @@ extension Torrent {
         default:
             state = .unknown
         }
+        
+        self.title = TorrentNameParser.parseTorrentName(name)
     }
 }
 
@@ -247,22 +250,9 @@ extension Torrent {
         upLimit: 0,
         uploaded: 0,
         uploadedSession: 0,
-        upspeed: 0
+        upspeed: 0,
+        title: TorrentNameParser.parseTorrentName("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]")
     )
-}
-
-extension Torrent {
-    var remainingSize: Int64 {
-        Int64(Double(size) * (1.0 - progress))
-    }
-    
-    func remainingTime(dlspeed: Int) -> TimeInterval {
-        guard dlspeed > 0 else {
-            return 0
-        }
-        
-        return TimeInterval(remainingSize) / TimeInterval(dlspeed)
-    }
 }
 
 extension Array<Torrent> {

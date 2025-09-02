@@ -12,42 +12,26 @@ struct TorrentItemView: View {
     @Environment(TorrentRepository.self) private var torrentRepository
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                TorrentTitleView(title: TorrentNameParser.parseTorrentName(torrent.name))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                HStack {
-                    HStack(spacing: .zero) {
-                        Image(systemName: "document")
-                        ByteView(item: .size(Int(torrent.size)))
-                    }
-                    HStack(spacing: .zero) {
-                        Image(systemName: "arrow.down")
-                            .foregroundStyle(.green)
-                        ByteView(item: .speed(torrent.dlspeed))
-                    }
-                    HStack(spacing: .zero) {
-                        Image(systemName: "arrow.up")
-                            .foregroundStyle(.blue)
-                        ByteView(item: .speed(torrent.upspeed))
-                    }
-                    
-                    let remainingTime = torrent.remainingTime(dlspeed: torrent.dlspeed)
-                    if remainingTime > 0, let remainingTimeString = DateComponentsFormatter.timeRemaingFormatter.string(from: remainingTime) {
-                        HStack(spacing: .zero) {
-                            Image(systemName: "clock")
-                            Text(remainingTimeString)
-                        }
-                    }
+        VStack(alignment: .leading) {
+            TorrentTitleView(title: torrent.title)
+            HStack(alignment: .bottom) {
+                TorrentTitleMetadataView(title: torrent.title)
+                TorrentDownloadView(
+                    state: torrent.state,
+                    progress: torrent.progress,
+                    size: Int(torrent.size),
+                    dlspeed: torrent.dlspeed,
+                    upspeed: torrent.upspeed
+                )
+                Spacer(minLength: 12)
+                DownloadButton(progress: torrent.progress, state: torrent.state) { action in
+                    handleAction(action: action)
                 }
-                .font(.caption.weight(.medium))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            DownloadButton(progress: torrent.progress, state: torrent.state) { action in
-                handleAction(action: action)
             }
         }
+        .padding(12)
+        .background(Color.background)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
     
     private func handleAction(action: TorrentAction) {
@@ -70,4 +54,5 @@ struct TorrentItemView: View {
     TorrentItemView(torrent: .placeholder)
         .environment(TorrentRepository())
         .padding()
+        .background(Color.backgroundSecond)
 }

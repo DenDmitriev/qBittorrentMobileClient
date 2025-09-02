@@ -42,7 +42,6 @@ struct TorrentNameParser {
         } else if let season {
             torrentName = torrentName.components(separatedBy: " \(season) -").first ?? name
         }
-        
         if let year {
             torrentName = torrentName.components(separatedBy: year).first ?? torrentName
         }
@@ -52,11 +51,18 @@ struct TorrentNameParser {
         
         torrentName = torrentName.components(separatedBy: ".").joined(separator: " ").trimmingCharacters(in: .whitespaces)
         
-        return TorrentTitle(name: torrentName, season: season, episode: episode, format: format, year: year, original: name)
+        // Определение типа
+        if season != nil {
+            return .series(TorrentTitle.Series(name: torrentName, session: season, episode: episode, format: format, year: year, original: name))
+        } else if format != nil || year != nil {
+            return .movie(TorrentTitle.Movie(name: torrentName, format: format, year: year, original: name))
+        } else {
+            return .other(TorrentTitle.Other(original: name))
+        }
     }
 }
 
-#Preview {
+struct TorrentTitlesView: View {
     let torrentNames = [
         "The.Tree.of.Life.2011.1080p.BluRay.2xRus.Eng.HDCLUB.mkv",
         "Nine Perfect Strangers 1 - LostFilm.TV [1080p]",
@@ -69,35 +75,82 @@ struct TorrentNameParser {
         "Dept.Q.S01E07.1080p.rus.LostFilm.TV.mkv",
         "Крестный отец: Трилогия / The Godfather Collection: The Coppola Restoration (Френсис Форд Коппола / Francis Ford Coppola) [1972/1974/1990, США, драма,"
     ]
-    List(torrentNames.map(TorrentNameParser.parseTorrentName), id: \.self) { torrent in
-        VStack(alignment: .leading, spacing: 4) {
-            Text(torrent.original)
-                .font(.caption2)
-            Text(torrent.name)
-                .font(.headline)
-                .lineLimit(2)
-            HStack {
-                if let season = torrent.season {
-                    Text("Season \(season)")
-                }
-                if let episode = torrent.episode {
-                    Text("Episode \(episode)")
-                }
-            }
-            HStack {
-                if let format = torrent.format {
-                    Text(format)
-                        .font(.subheadline)
+    
+    var body: some View {
+        NavigationView {
+            List(torrentNames.map(TorrentNameParser.parseTorrentName), id: \.self) { torrent in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(torrent.original)
+                        .font(.caption2)
                         .foregroundColor(.gray)
+                    
+                    switch torrent {
+                    case .movie(let movie):
+                        Text(movie.name)
+                            .font(.headline)
+                            .lineLimit(2)
+                        HStack {
+                            if let year = movie.year {
+                                Text(year)
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                            }
+                            if let format = movie.format {
+                                Text(format)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    case .series(let series):
+                        Text(series.name)
+                            .font(.headline)
+                            .lineLimit(2)
+                        HStack {
+                            if let year = series.year {
+                                Text(year)
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                            }
+                            if let season = series.session {
+                                Text("Season \(season)")
+                                    .font(.subheadline)
+                            }
+                            if let episode = series.episode {
+                                Text("Episode \(episode)")
+                                    .font(.subheadline)
+                            }
+                        }
+                        if let format = series.format {
+                            Text(format)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                    case .other(let other):
+                        Text(other.original)
+                            .font(.headline)
+                            .lineLimit(2)
+                    }
                 }
-                
-                if let year = torrent.year {
-                    Text(year)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
+                .padding(.vertical, 4)
             }
+            .navigationTitle("Torrents")
         }
-        .padding(.vertical, 4)
     }
+}
+
+extension TorrentTitle {
+    var original: String {
+        switch self {
+        case .movie(let movie):
+            return movie.original
+        case .series(let series):
+            return series.original
+        case .other(let other):
+            return other.original
+        }
+    }
+}
+
+#Preview {
+    TorrentTitlesView()
 }

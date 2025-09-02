@@ -65,17 +65,17 @@ struct ByteView: View {
             let (value, unit) = FileSizeFormatterUtil.formatFileSizeWithUnit(Int64(size))
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(.body))
                 Text(unit)
-                    .font(.system(.caption, design: .monospaced))
+                    .font(.system(.caption))
             }
         case .speed(let speed):
             let (value, unit) = FileSizeFormatterUtil.formatSpeedWithUnit(Int64(speed))
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(.body))
                 Text("\(unit)/s")
-                    .font(.system(.caption, design: .monospaced))
+                    .font(.system(.caption))
             }
         }
     }
