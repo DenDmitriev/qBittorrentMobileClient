@@ -11,4 +11,5 @@ enum AppStorageKeys {
     static let username = "Username"
     static let password = "Password"
     static let serverUrl = "serverUrl"
+    static let torrentSettingDeleteFiles = "TorrentSettingDeleteFiles"
 }

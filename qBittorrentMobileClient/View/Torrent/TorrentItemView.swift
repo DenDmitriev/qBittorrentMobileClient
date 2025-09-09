@@ -10,6 +10,7 @@ import SwiftUI
 struct TorrentItemView: View {
     let torrent: Torrent
     @Environment(TorrentRepository.self) private var torrentRepository
+    @AppStorage(AppStorageKeys.torrentSettingDeleteFiles) private var deleteFiles = true
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -32,6 +33,12 @@ struct TorrentItemView: View {
         .padding(12)
         .background(Color.background)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .contextMenu {
+            Button("Resume", systemImage: "play", action: { handleAction(action: .resume) } )
+            Button("Force Start", systemImage: "forward", action: { handleAction(action: .forceStart) } )
+            Button("Recheck", systemImage: "arrow.triangle.2.circlepath", action: { handleAction(action: .recheck) } )
+            Button("Delete", systemImage: "trash", role: .destructive, action: { handleAction(action: .delete) } )
+        }
     }
     
     private func handleAction(action: TorrentAction) {
@@ -45,6 +52,8 @@ struct TorrentItemView: View {
                 try await torrentRepository.forceStartTorrent(id: torrent.id)
             case .recheck:
                 try await torrentRepository.recheckTorrent(id: torrent.id)
+            case .delete:
+                try await torrentRepository.deleteTorrent(id: torrent.id, deleteFiles: deleteFiles)
             }
         }
     }

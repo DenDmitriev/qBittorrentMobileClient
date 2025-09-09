@@ -14,9 +14,10 @@ enum TorrentApi {
     case resume(id: Torrent.ID)
     case forceStart(id: Torrent.ID)
     case recheck(id: Torrent.ID)
+    case delete(id: Torrent.ID, deleteFiles: Bool)
     case getTorrentContents(id: Torrent.ID)
-    case addTorrent(url: URL, paused: Bool, loadSequentially: Bool)
-    case addTorrentFile(url: URL, paused: Bool, loadSequentially: Bool)
+    case addTorrent(url: URL, paused: Bool, loadSequentially: Bool, dlLimit: Int?, upLimit: Int?)
+    case addTorrentFile(url: URL, paused: Bool, loadSequentially: Bool, dlLimit: Int?, upLimit: Int?)
     case setFilePriority(torrentId: Torrent.ID, fileId: TorrentContent.ID, priority: TorrentPriority)
 }
 
@@ -40,6 +41,8 @@ extension TorrentApi: MobileApiTargetType, TorrentServer {
             return "/api/v2/torrents/setForceStart"
         case .recheck:
             return "/api/v2/torrents/recheck"
+        case .delete:
+            return "/api/v2/torrents/delete"
         case .getTorrentContents:
             return "/api/v2/torrents/files"
         case .addTorrent, .addTorrentFile:
@@ -53,7 +56,7 @@ extension TorrentApi: MobileApiTargetType, TorrentServer {
         switch self {
         case .getTorrentsInfo:
             return .get
-        case .pause, .resume, .forceStart, .recheck, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
+        case .pause, .resume, .forceStart, .recheck, .delete, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
             return .post
         }
     }
@@ -62,7 +65,7 @@ extension TorrentApi: MobileApiTargetType, TorrentServer {
         switch self {
         case .getTorrentsInfo:
             return .requestPlain
-        case .pause, .resume, .forceStart, .recheck, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
+        case .pause, .resume, .forceStart, .recheck, .delete, .addTorrent, .addTorrentFile, .getTorrentContents, .setFilePriority:
             return .uploadMultipart(formData)
         }
     }
@@ -75,6 +78,11 @@ extension TorrentApi: MobileApiTargetType, TorrentServer {
             break
         case .pause(let id), .resume(let id), .recheck(let id):
             multipartData.append(MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hashes"))
+        case let .delete(id, deleteFiles):
+            multipartData.append(contentsOf: [
+                MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hashes"),
+                MultipartFormData(provider: .data(String(deleteFiles).data(using: .utf8)!), name: "deleteFiles")
+            ])
         case .forceStart(let id):
             multipartData.append(contentsOf: [
                 MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hashes"),
@@ -82,18 +90,30 @@ extension TorrentApi: MobileApiTargetType, TorrentServer {
             ])
         case .getTorrentContents(let id):
             multipartData.append(MultipartFormData(provider: .data(id.data(using: .utf8)!), name: "hash"))
-        case let .addTorrent(url, paused, loadSequentially):
+        case let .addTorrent(url, paused, loadSequentially, dlLimit, upLimit):
             multipartData.append(contentsOf: [
                 MultipartFormData(provider: .data(url.absoluteString.data(using: .utf8)!), name: "urls"),
                 MultipartFormData(provider: .data(String(paused).data(using: .utf8)!), name: "paused"),
                 MultipartFormData(provider: .data(String(loadSequentially).data(using: .utf8)!), name: "sequentialDownload")
             ])
-        case let .addTorrentFile(url, paused, loadSequentially):
+            if let dlLimit {
+                multipartData.append(MultipartFormData(provider: .data(String(dlLimit).data(using: .utf8)!), name: "dlLimit"))
+            }
+            if let upLimit {
+                multipartData.append(MultipartFormData(provider: .data(String(upLimit).data(using: .utf8)!), name: "upLimit"))
+            }
+        case let .addTorrentFile(url, paused, loadSequentially, dlLimit, upLimit):
             multipartData.append(contentsOf: [
                 MultipartFormData(provider: .file(url), name: "torrents", fileName: url.lastPathComponent, mimeType: "application/x-bittorrent"),
                 MultipartFormData(provider: .data(String(paused).data(using: .utf8)!), name: "paused"),
                 MultipartFormData(provider: .data(String(loadSequentially).data(using: .utf8)!), name: "sequentialDownload")
             ])
+            if let dlLimit {
+                multipartData.append(MultipartFormData(provider: .data(String(dlLimit).data(using: .utf8)!), name: "dlLimit"))
+            }
+            if let upLimit {
+                multipartData.append(MultipartFormData(provider: .data(String(upLimit).data(using: .utf8)!), name: "upLimit"))
+            }
         case let .setFilePriority(torrentId, fileId,  priority):
             multipartData.append(contentsOf: [
                 MultipartFormData(provider: .data(torrentId.data(using: .utf8)!), name: "hash"),

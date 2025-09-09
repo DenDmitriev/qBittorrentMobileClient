@@ -8,33 +8,35 @@
 import SwiftUI
 
 struct TorrentsView: View {
-    @StateObject @StateFlow var torrents: [Torrent]?
+    @StateFlow var torrents: [Torrent]?
     @Environment(TorrentRepository.self) private var torrentRepository
     @State private var isAddTorrentPresented = false
     
     init(torrents: [Torrent]? = nil) {
-        self._torrents = .init(wrappedValue: .init(value: torrents))
+        self._torrents = .init(value: torrents)
     }
     
     var body: some View {
-        VStack {
+        ScrollView {
             if let torrents {
-                ScrollView {
-                    LazyVStack(spacing: 20) {
-                        ForEach(torrents) { torrent in
-                            NavigationLink(value: Router.torrentContent(torrent: torrent)) {
-                                TorrentItemView(torrent: torrent)
-                            }
-                            .tint(Color.primary)
+                LazyVStack {
+                    ForEach(torrents) { torrent in
+                        NavigationLink(value: Router.torrentContent(torrent: torrent)) {
+                            TorrentItemView(torrent: torrent)
                         }
+                        .tint(Color.primary)
                     }
-                    .padding()
                 }
-                .background(Color.backgroundSecond)
-            } else {
-                Text("Пусто")
+                .padding()
             }
         }
+        .background(Color.backgroundSecond)
+        .stateFlow(
+            _torrents.phase,
+            loadingContent: { SkeletonContentView(height: 120) },
+            emptyContent: { EmptyContentView(retry: { _torrents.retry() }) },
+            failureContent: { FailureContentView(error: $0, retry: { _torrents.retry() }) }
+        )
         .sheet(isPresented: $isAddTorrentPresented) {
             AddTorrentView()
         }
@@ -42,7 +44,7 @@ struct TorrentsView: View {
         .navigationTitle(String(localized: "Torrents"))
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                ServerStatusIcon(error: $torrents.error)
+                ServerStatusIcon(error: _torrents.error)
             }
         }
         .toolbar {
@@ -51,16 +53,12 @@ struct TorrentsView: View {
             }
         }
         .onAppear {
-            if _torrents.wrappedValue.wrappedValue == nil {
-                _torrents.wrappedValue.setFetch {
-                    try await torrentRepository.getTorrentsInfo()
-                }
-            } else {
-                _torrents.wrappedValue.resumeFlow()
+            _torrents.setFetch {
+                try await torrentRepository.getTorrentsInfo()
             }
         }
         .onDisappear {
-            _torrents.wrappedValue.pauseFlow()
+            _torrents.invalidate()
         }
     }
     

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServerStatusIcon: View {
-    @Binding var error: Error?
+    let error: Error?
     
     var body: some View {
         Circle()
@@ -26,5 +26,5 @@ struct ServerStatusIcon: View {
 }
 
 #Preview {
-    ServerStatusIcon(error: .constant(nil))
+    ServerStatusIcon(error: nil)
 }

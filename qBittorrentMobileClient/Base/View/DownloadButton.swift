@@ -12,6 +12,7 @@ enum TorrentAction {
     case resume
     case forceStart
     case recheck
+    case delete
     
     /*
     func isSome(state: TorrentState) -> Bool {
@@ -42,8 +43,13 @@ struct DownloadButton: View {
     
     var body: some View {
         ZStack {
-            CircularProgressView(progress: progress)
-                .environment(\.tintColor, colorForState)
+            switch state {
+            case .seeding, .pausedSeeding:
+                EmptyView()
+            default:
+                CircularProgressView(progress: progress)
+                    .environment(\.tintColor, colorForState)
+            }
             
             Button {
                 switch state {

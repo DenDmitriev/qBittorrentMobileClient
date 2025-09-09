@@ -11,17 +11,17 @@ struct TorrentContentView: View {
     let torrent: Torrent
 
     @Environment(TorrentRepository.self) private var torrentRepository
-    @StateObject @StateFlow private var contents: [TorrentContent]?
+    @StateFlow private var contents: [TorrentContent]?
     
     init(torrent: Torrent) {
         self.torrent = torrent
-        self._contents = .init(wrappedValue: .init(value: nil))
+        self._contents = .init(value: nil)
     }
     
     var body: some View {
         VStack {
-            if let contents {
-                ScrollView(.vertical) {
+            ScrollView(.vertical) {
+                if let contents {
                     LazyVStack {
                         ForEach(contents) { content in
                             TorrentContentItemView(torrent: torrent, content: content)
@@ -29,26 +29,23 @@ struct TorrentContentView: View {
                     }
                     .padding()
                 }
-                .background(Color.backgroundSecond)
-            } else {
-                if let error = _contents.wrappedValue.error {
-                    Text((error as? ServerError)?.details.message ?? "Error")
-                } else {
-                    Text("Пусто")
-                }
             }
+            .background(Color.backgroundSecond)
         }
+        .stateFlow(
+            _contents.phase,
+            loadingContent: { SkeletonContentView(height: 137) },
+            emptyContent: { EmptyContentView(retry: { _contents.retry() }) },
+            failureContent: { FailureContentView(error: $0, retry: { _contents.retry() }) }
+        )
+        .navigationTitle(String(localized: "Torrent Content"))
         .onAppear {
-            if _contents.wrappedValue.wrappedValue == nil {
-                _contents.wrappedValue.setFetch {
-                    try await torrentRepository.getTorrentContent(id: torrent.id)
-                }
-            } else {
-                _contents.wrappedValue.resumeFlow()
+            _contents.setFetch {
+                try await torrentRepository.getTorrentContent(id: torrent.id)
             }
         }
         .onDisappear {
-            _contents.wrappedValue.pauseFlow()
+            _contents.invalidate()
         }
     }
 }
