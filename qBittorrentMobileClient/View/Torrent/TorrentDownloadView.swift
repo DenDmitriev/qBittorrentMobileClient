@@ -21,25 +21,22 @@ struct TorrentDownloadView: View {
             switch state {
             case .downloading:
                 if progress < 1, dlspeed > 0 {
-                    HStack(spacing: .zero) {
+                    ByteView(item: .speed(dlspeed)) {
                         Image(systemName: "arrow.down")
                             .foregroundStyle(.green)
-                        ByteView(item: .speed(dlspeed))
                     }
                 }
                 if upspeed > 0 {
-                    HStack(spacing: .zero) {
+                    ByteView(item: .speed(upspeed)) {
                         Image(systemName: "arrow.up")
                             .foregroundStyle(.blue)
-                        ByteView(item: .speed(upspeed))
                     }
                 }
             case .seeding:
                 if upspeed > 0 {
-                    HStack(spacing: .zero) {
+                    ByteView(item: .speed(upspeed)) {
                         Image(systemName: "arrow.up")
                             .foregroundStyle(.blue)
-                        ByteView(item: .speed(upspeed))
                     }
                 }
             case .pausedSeeding, .checking, .queued, .paused, .error, .missingFiles, .allocating, .moving, .unknown:

@@ -12,10 +12,10 @@ struct VideoFormatView: View {
     
     var body: some View {
         Text(format)
-            .font(.caption.bold())
+            .font(.caption.weight(.bold))
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Capsule().stroke(lineWidth: 1))
+            .background(RoundedRectangle(cornerRadius: 4).stroke(lineWidth: 1))
             .foregroundStyle(.secondary)
     }
 }

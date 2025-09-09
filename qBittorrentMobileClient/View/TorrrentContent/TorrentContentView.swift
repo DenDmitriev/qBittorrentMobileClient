@@ -27,7 +27,9 @@ struct TorrentContentView: View {
                             TorrentContentItemView(torrent: torrent, content: content)
                         }
                     }
+                    .padding()
                 }
+                .background(Color.backgroundSecond)
             } else {
                 if let error = _contents.wrappedValue.error {
                     Text((error as? ServerError)?.details.message ?? "Error")

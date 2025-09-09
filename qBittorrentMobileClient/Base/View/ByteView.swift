@@ -56,26 +56,43 @@ class FileSizeFormatterUtil {
     }
 }
 
-struct ByteView: View {
+struct ByteView<Icon: View>: View {
     let item: ByteItem
+    let icon: (() -> Icon)?
+    
+    init(item: ByteItem, icon: @escaping () -> Icon) {
+        self.item = item
+        self.icon = icon
+    }
+    
+    init(item: ByteItem) where Icon == EmptyView {
+        self.item = item
+        self.icon = nil
+    }
     
     var body: some View {
-        switch item {
-        case .size(let size):
-            let (value, unit) = FileSizeFormatterUtil.formatFileSizeWithUnit(Int64(size))
-            HStack(alignment: .lastTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(.body))
-                Text(unit)
-                    .font(.system(.caption))
+        HStack(spacing: .zero) {
+            if let icon {
+                icon()
             }
-        case .speed(let speed):
-            let (value, unit) = FileSizeFormatterUtil.formatSpeedWithUnit(Int64(speed))
-            HStack(alignment: .lastTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(.body))
-                Text("\(unit)/s")
-                    .font(.system(.caption))
+            
+            switch item {
+            case .size(let size):
+                let (value, unit) = FileSizeFormatterUtil.formatFileSizeWithUnit(Int64(size))
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(value)
+                        .font(.system(.body))
+                    Text(unit)
+                        .font(.system(.caption))
+                }
+            case .speed(let speed):
+                let (value, unit) = FileSizeFormatterUtil.formatSpeedWithUnit(Int64(speed))
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(value)
+                        .font(.system(.body))
+                    Text("\(unit)/s")
+                        .font(.system(.caption))
+                }
             }
         }
     }

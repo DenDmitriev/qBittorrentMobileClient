@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct ContentTypeWithFormat: Hashable {
+    let type: ContentType
+    let format: String
+}
+
 enum ContentType: String, CaseIterable {
     case video
     case audio

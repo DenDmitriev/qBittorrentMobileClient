@@ -196,7 +196,7 @@ extension Torrent {
             state = .unknown
         }
         
-        self.title = TorrentNameParser.parseTorrentName(name)
+        self.title = TorrentNameParser.parse(name)
     }
 }
 
@@ -251,7 +251,7 @@ extension Torrent {
         uploaded: 0,
         uploadedSession: 0,
         upspeed: 0,
-        title: TorrentNameParser.parseTorrentName("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]")
+        title: TorrentNameParser.parse("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]")
     )
 }
 

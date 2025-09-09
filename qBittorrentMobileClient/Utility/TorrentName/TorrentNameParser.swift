@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct TorrentNameParser {
-    static func parseTorrentName(_ name: String) -> TorrentTitle {
+    static func parse(_ name: String) -> TorrentTitle {
         // Регулярные выражения для извлечения данных
         let seasonEpisodePattern = try! NSRegularExpression(pattern: "S(\\d{1,2})E(\\d{1,2})")
         let seasonOnlyPattern = try! NSRegularExpression(pattern: "\\b(\\d{1,2})\\s*-\\s*LostFilm")
@@ -78,7 +78,7 @@ struct TorrentTitlesView: View {
     
     var body: some View {
         NavigationView {
-            List(torrentNames.map(TorrentNameParser.parseTorrentName), id: \.self) { torrent in
+            List(torrentNames.map(TorrentNameParser.parse), id: \.self) { torrent in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(torrent.original)
                         .font(.caption2)

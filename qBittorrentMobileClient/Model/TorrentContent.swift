@@ -39,6 +39,10 @@ struct TorrentContent: Codable, Hashable, Identifiable {
     let priority: TorrentPriority
     let progress: Double
     let size: Int64
+    
+    let lastComponentName: String
+    let title: TorrentTitle
+    let contentType: ContentTypeWithFormat
 
     enum CodingKeys: String, CodingKey {
         case availability
@@ -53,14 +57,21 @@ struct TorrentContent: Codable, Hashable, Identifiable {
 }
 
 extension TorrentContent {
-    var fileExtension: String {
-        let components = name.components(separatedBy: "/")
-        let fileName = components.last ?? name
-        return URL(fileURLWithPath: fileName).pathExtension
-    }
-    
-    var contentType: ContentType {
-        ContentType(from: fileExtension)
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.availability = try container.decode(Double.self, forKey: .availability)
+        self.index = try container.decode(Int.self, forKey: .index)
+        self.isSeed = try container.decodeIfPresent(Bool.self, forKey: .isSeed)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.pieceRange = try container.decode([Int].self, forKey: .pieceRange)
+        self.priority = try container.decode(TorrentPriority.self, forKey: .priority)
+        self.progress = try container.decode(Double.self, forKey: .progress)
+        self.size = try container.decode(Int64.self, forKey: .size)
+        self.lastComponentName = name.components(separatedBy: "/").last ?? name
+        self.title = TorrentNameParser.parse(lastComponentName)
+        let format = URL(fileURLWithPath: lastComponentName).pathExtension
+        let contentType = ContentType(from: format)
+        self.contentType = .init(type: contentType, format: format)
     }
 }
 
@@ -79,7 +90,10 @@ extension TorrentContent {
         pieceRange: [0, 379],
         priority: .normal,
         progress: 0.6,
-        size: 3185709566
+        size: 3185709566,
+        lastComponentName: "The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.mkv",
+        title: TorrentNameParser.parse("The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.mkv"),
+        contentType: .init(type: .video, format: "mkv")
     )
     
     static let audio: Self = .init(
@@ -90,7 +104,10 @@ extension TorrentContent {
         pieceRange: [0, 379],
         priority: .maximal,
         progress: 1,
-        size: 72345679
+        size: 72345679,
+        lastComponentName: "The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.wav",
+        title: TorrentNameParser.parse("The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.wav"),
+        contentType: .init(type: .audio, format: "wav")
     )
     
     static let subtitle: Self = .init(
@@ -101,7 +118,10 @@ extension TorrentContent {
         pieceRange: [0, 379],
         priority: .high,
         progress: 0,
-        size: 654321
+        size: 654321,
+        lastComponentName: "The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.srt",
+        title: TorrentNameParser.parse("The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.srt"),
+        contentType: .init(type: .subtitle, format: "srt")
     )
     
     static let file: Self = .init(
@@ -112,6 +132,9 @@ extension TorrentContent {
         pieceRange: [0, 379],
         priority: .doNotDownload,
         progress: 1,
-        size: 123456
+        size: 123456,
+        lastComponentName: "The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.txt",
+        title: TorrentNameParser.parse("The.Little.Drummer.Girl.S01E01.1080p.rus.LostFilm.TV.txt"),
+        contentType: .init(type: .text, format: "txt")
     )
 }
