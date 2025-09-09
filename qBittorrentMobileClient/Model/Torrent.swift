@@ -62,6 +62,7 @@ struct Torrent: Codable, Hashable, Identifiable {
         hash
     }
     let title: TorrentTitle
+    let torrentCategory: TorrentCategory
     
     enum CodingKeys: String, CodingKey {
         case addedOn = "added_on"
@@ -197,6 +198,7 @@ extension Torrent {
         }
         
         self.title = TorrentNameParser.parse(name)
+        torrentCategory = TorrentCategory(state: state)
     }
 }
 
@@ -251,7 +253,8 @@ extension Torrent {
         uploaded: 0,
         uploadedSession: 0,
         upspeed: 0,
-        title: TorrentNameParser.parse("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]")
+        title: TorrentNameParser.parse("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]"),
+        torrentCategory: TorrentCategory(state: .pausedSeeding)
     )
 }
 

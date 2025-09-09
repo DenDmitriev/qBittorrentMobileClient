@@ -82,6 +82,10 @@ struct StateFlow<T: Codable & Hashable & Sendable>: DynamicProperty {
         self.value = value
     }
     
+    init(value: T) {
+        self.value = value
+    }
+    
     func setFetch(_ fetch: @escaping () async throws -> T) {
         invalidate()
         isFlowPaused = false
