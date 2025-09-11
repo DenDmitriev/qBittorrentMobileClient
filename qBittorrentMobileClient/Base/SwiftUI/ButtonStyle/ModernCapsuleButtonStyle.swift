@@ -10,7 +10,7 @@ import SwiftUI
 struct ModernCapsuleButtonStyle: ButtonStyle {
     // Параметры стиля
     enum Style {
-        case primary, secondary, destructive
+        case primary, primaryInverse, secondary, destructive
     }
     
     let style: Style
@@ -21,7 +21,9 @@ struct ModernCapsuleButtonStyle: ButtonStyle {
     private var backgroundColor: Color {
         switch style {
         case .primary:
-            return .blue
+            return .accent
+        case .primaryInverse:
+            return .backgroundSecond
         case .secondary:
             return .gray
         case .destructive:
@@ -29,10 +31,12 @@ struct ModernCapsuleButtonStyle: ButtonStyle {
         }
     }
     
-    private var foregroundColor: Color {
+    private var foregroundColor: some ShapeStyle {
         switch style {
         case .primary, .destructive:
             return .white
+        case .primaryInverse:
+            return .label
         case .secondary:
             return .white
         }
@@ -58,6 +62,7 @@ struct ModernCapsuleButtonStyle: ButtonStyle {
             configuration.label
                 .font(.system(.body, design: .rounded, weight: .medium))
                 .foregroundStyle(foregroundColor)
+                .opacity(isEnabled ? 1.0 : disabledOpacity)
         }
         .frame(maxWidth: maxWidth)
         .padding()
@@ -81,46 +86,64 @@ extension ButtonStyle where Self == ModernCapsuleButtonStyle {
 }
 
 #Preview {
-    VStack(spacing: 20) {
-        // Primary стиль
-        Button("Primary Button") {
-            print("Primary button tapped")
-        }
-        .buttonStyle(.modernCapsule(.primary))
+    struct PreviewWrapper: View {
+        @State private var isLoading = true
         
-        // Secondary стиль
-        Button("Secondary Button") {
-            print("Secondary button tapped")
+        var body: some View {
+            VStack(spacing: 20) {
+                // Primary стиль
+                Button("Primary Button") {
+                    print("Primary button tapped")
+                }
+                .buttonStyle(.modernCapsule(.primary))
+                
+                // Primary стиль
+                Button("Primary Inverse Button") {
+                    print("Primary Inverse button tapped")
+                }
+                .buttonStyle(.modernCapsule(.primaryInverse))
+                
+                // Secondary стиль
+                Button("Secondary Button") {
+                    print("Secondary button tapped")
+                }
+                .buttonStyle(.modernCapsule(.secondary))
+                
+                // Destructive стиль
+                Button("Destructive Button") {
+                    print("Destructive button tapped")
+                }
+                .buttonStyle(.modernCapsule(.destructive))
+                
+                // Loading стиль
+                Button("Loading Button") {
+                    print("Loading button tapped")
+                }
+                .buttonStyle(.modernCapsule(.primary))
+                .loading(isLoading)
+                
+                // Disabled состояние
+                Button("Disabled Button") {
+                    print("Disabled button tapped")
+                }
+                .buttonStyle(.modernCapsule(.primary))
+                .disabled(true)
+                
+                // Длинный текст
+                Button("Button with Very Long Text Content") {
+                    print("Long text button tapped")
+                }
+                .buttonStyle(.modernCapsule(.secondary, maxWidth: .infinity))
+                
+                List {
+                    Toggle(isOn: $isLoading) {
+                        Text("Loading")
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.background)
         }
-        .buttonStyle(.modernCapsule(.secondary))
-        
-        // Destructive стиль
-        Button("Destructive Button") {
-            print("Destructive button tapped")
-        }
-        .buttonStyle(.modernCapsule(.destructive))
-        
-        // Loading стиль
-        Button("Loading Button") {
-            print("Loading button tapped")
-        }
-        .loading(true)
-        .buttonStyle(.modernCapsule(.primary))
-        
-        // Disabled состояние
-        Button("Disabled Button") {
-            print("Disabled button tapped")
-        }
-        .buttonStyle(.modernCapsule(.primary))
-        .disabled(true)
-        
-        // Длинный текст
-        Button("Button with Very Long Text Content") {
-            print("Long text button tapped")
-        }
-        .buttonStyle(.modernCapsule(.secondary, maxWidth: .infinity))
     }
-    .padding()
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.background)
+    return PreviewWrapper()
 }

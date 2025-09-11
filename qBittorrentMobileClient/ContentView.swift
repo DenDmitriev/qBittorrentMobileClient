@@ -16,6 +16,7 @@ struct ContentView: View {
             .fullScreenCover(isPresented: isAuthorizationPresented) {
                 AuthView()
             }
+            .addToast { item in ToastView(item: item) }
             .environment(authRepository)
     }
     
@@ -36,4 +37,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(AuthRepository())
+        .environment(ToastRouter())
 }

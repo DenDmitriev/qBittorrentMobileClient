@@ -9,7 +9,8 @@ import SwiftUI
 
 struct BoneView: View {
     var body: some View {
-        Color.background
+        Rectangle()
+            .fill(.background)
     }
 }
 

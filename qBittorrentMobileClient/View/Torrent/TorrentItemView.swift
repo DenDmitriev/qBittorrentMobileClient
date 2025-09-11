@@ -31,7 +31,7 @@ struct TorrentItemView: View {
             }
         }
         .padding(12)
-        .background(Color.background)
+        .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .contextMenu {
             Button("Resume", systemImage: "play", action: { handleAction(action: .resume) } )

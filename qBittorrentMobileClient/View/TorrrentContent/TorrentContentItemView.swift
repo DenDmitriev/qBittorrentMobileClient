@@ -38,7 +38,7 @@ struct TorrentContentItemView: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(12)
-        .background(Color.background)
+        .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
     

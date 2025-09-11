@@ -39,7 +39,7 @@ struct EmptyContentView: View {
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.background)
+        .background(.background)
     }
 }
 

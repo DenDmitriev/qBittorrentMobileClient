@@ -85,11 +85,11 @@ enum ServerError: Error {
     }
     
     var title: String {
-        let defaultTitle = "Error"
+        let defaultTitle = String(localized: "Error")
         var detailsTitle = ""
         switch self {
         case .networkError:
-            detailsTitle = "Соединение с сервером не установлено"
+            detailsTitle = String(localized: "Соединение с сервером не установлено")
         default:
             break
         }
@@ -107,7 +107,7 @@ enum ServerError: Error {
         let serverError: ServerError
         switch responseCode {
         case 200:
-            errorDetails.message = "Ошибка обработки"
+            errorDetails.message = String(localized: "Ошибка обработки")
             serverError = .systemError(details: errorDetails)
         case 400:
             serverError = .badRequest(details: errorDetails)
@@ -134,7 +134,7 @@ enum ServerError: Error {
         case 503:
             serverError = .serviceUnavailable(details: errorDetails)
         case 504:
-            errorDetails.message = "Ошибка соединения"
+            errorDetails.message = String(localized: "Ошибка соединения")
             serverError = .gatewayTimeOut(details: errorDetails)
         default:
             serverError = .unknown(details: errorDetails)
@@ -151,7 +151,7 @@ enum ServerError: Error {
             let errorCode = error.asAFError?.getErrorCode(),
             isNetworkErrorCode(errorCode)
         {
-            details.message = "Ошибка соединения"
+            details.message = String(localized: "Ошибка соединения")
             return .networkError(details: details)
         }
 
@@ -170,6 +170,12 @@ enum ServerError: Error {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try? decoder.decode(ErrorModel.self, from: response.data)
+    }
+}
+
+extension ServerError: LocalizedError {
+    var errorDescription: String? {
+        return details.message
     }
 }
 
