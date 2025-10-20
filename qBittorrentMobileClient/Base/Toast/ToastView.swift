@@ -29,7 +29,8 @@ struct ToastView: View {
                     }
                     Text(item.text)
                         .font(.caption)
-                        .lineLimit(2)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.5)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 

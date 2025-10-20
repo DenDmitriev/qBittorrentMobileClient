@@ -145,8 +145,8 @@ struct AddTorrentView: View {
     }
     
     private func addTorrentUrl(_ url: URL) {
-        let dlLimit = Int((Double(dlLimitString) ?? 0) * 1000)
-        let upLimit = Int((Double(upLimitString) ?? 0) * 1000)
+        let dlLimit = Int((Double(dlLimitString) ?? 0) * 1024)
+        let upLimit = Int((Double(upLimitString) ?? 0) * 1024)
         
         error = nil
         Task {

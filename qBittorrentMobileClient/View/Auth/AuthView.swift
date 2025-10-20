@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum AuthError: LocalizedError, Hashable {
-    case serverUrlFailure
+    case serverUrlFailure(String)
     case authFailure(String)
     
     var errorDescription: String? {
@@ -48,7 +48,19 @@ struct AuthView: View {
                         .frame(width: 200)
                         .padding(.top, 32)
                     
-                    TextField("URL Server qBittorrent ", text: $serverUrlString)
+                    VStack {
+                        Text("Welcome to qBittorrent Mobile")
+                            .font(.title2)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Enter your qBittorrent URL and username with password to login.")
+                            .font(.caption)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    
+                    TextField("URL qBittorrent", text: $serverUrlString)
+                        .textFieldStyle(.modern)
                         .focused($focusedField, equals: .server)
                         .onSubmit { focusedField = .username }
                         .keyboardType(.URL)
@@ -59,10 +71,12 @@ struct AuthView: View {
                             validateUrl(newValue)
                         }
                     TextField("Username", text: $username)
+                        .textFieldStyle(.modern)
                         .focused($focusedField, equals: .username)
                         .onSubmit { focusedField = .password }
                         .textInputAutocapitalization(.never)
                     SecureField("Password", text: $password)
+                        .textFieldStyle(.modern)
                         .focused($focusedField, equals: .password)
                         .onSubmit { focusedField = nil }
                 }
@@ -70,6 +84,9 @@ struct AuthView: View {
                 .tint(.white)
             }
             .background(Color.accentColor)
+            .onTapGesture {
+                focusedField = nil
+            }
         }
         .safeAreaInset(edge: .bottom, content: {
             Button("Login", action: login)
@@ -98,19 +115,10 @@ struct AuthView: View {
     
     private func validateUrl(_ urlString: String) {
         error = nil
-        
-        var formattedUrl = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        // Добавляем http://, если схема не указана
-        if !formattedUrl.hasPrefix("http://") && !formattedUrl.hasPrefix("https://") {
-            formattedUrl = "http://" + formattedUrl
-        }
-        
-        // Проверяем, является ли строка валидным URL
-        if let url = URL(string: formattedUrl), url.scheme != nil, url.host != nil {
-            serverUrl = url
-        } else {
-            error = .serverUrlFailure
+        do {
+            serverUrl = try URLFormatter.create(urlString)
+        } catch {
+            self.error = .serverUrlFailure(error.localizedDescription)
         }
     }
     

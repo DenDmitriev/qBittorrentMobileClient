@@ -25,14 +25,22 @@ class AuthRepository {
             UserDefaults.standard.set(newValue, forKey: AppStorageKeys.password)
         }
     }
+    var serverUrl: URL? {
+        get {
+            UserDefaults.standard.url(forKey: AppStorageKeys.serverUrl)
+        }
+        set(newValue) {
+            UserDefaults.standard.set(newValue, forKey: AppStorageKeys.serverUrl)
+        }
+    }
     
     @MainActor var isAuthorized: Bool? = nil
+    @MainActor var isFirstStart: Bool { serverUrl == nil || username == nil || password == nil }
         
     private var mobileService = MobileService.shared
     
     init() {
         mobileService.onAuthRefreshCompletion = { [weak self] isAuthorized in
-            print(isAuthorized)
             Task { @MainActor in
                 self?.isAuthorized = isAuthorized
             }

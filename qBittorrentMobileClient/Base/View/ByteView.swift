@@ -71,11 +71,7 @@ struct ByteView<Icon: View>: View {
     }
     
     var body: some View {
-        HStack(spacing: .zero) {
-            if let icon {
-                icon()
-            }
-            
+        HStack(spacing: 4) {
             switch item {
             case .size(let size):
                 let (value, unit) = FileSizeFormatterUtil.formatFileSizeWithUnit(Int64(size))
@@ -93,6 +89,9 @@ struct ByteView<Icon: View>: View {
                     Text("\(unit)/s")
                         .font(.system(.caption))
                 }
+            }
+            if let icon {
+                icon()
             }
         }
     }

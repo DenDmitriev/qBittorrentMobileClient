@@ -112,7 +112,7 @@ struct DownloadButton: View {
     private var colorForState: Color {
         switch state {
         case .downloading:
-            return .blue // Активная загрузка
+            return .accent // Активная загрузка
         case .paused:
             return .gray // Пауза
         case .pausedSeeding:

@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "qBittorrent_black.svg",
+      "filename" : "qBittorrent.svg",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "qBittorrent.svg",
+      "filename" : "qBittorrent_black.svg",
       "idiom" : "universal"
     }
   ],

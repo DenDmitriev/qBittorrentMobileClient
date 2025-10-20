@@ -10,25 +10,29 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthRepository.self) private var authRepository
     @AppStorage(AppStorageKeys.serverUrl) private var serverUrl: URL?
+    @State private var error: LocalizedError?
     
     var body: some View {
-        MainTabView()
-            .fullScreenCover(isPresented: isAuthorizationPresented) {
-                AuthView()
-            }
-            .addToast { item in ToastView(item: item) }
-            .environment(authRepository)
+        if authRepository.isAuthorized == nil {
+            LaunchView()
+        } else {
+            MainTabView()
+                .fullScreenCover(isPresented: isAuthorizationPresented) {
+                    AuthView()
+                }
+                .addToast { item in ToastView(item: item) }
+        }
     }
     
     private var isAuthorizationPresented: Binding<Bool> { Binding(
         get: {
             guard
                 serverUrl != nil,
-                let isAuthorized = authRepository.isAuthorized
+                authRepository.isAuthorized ?? false
             else {
                 return true
             }
-            return !isAuthorized
+            return false
         },
         set: { _ in })
     }

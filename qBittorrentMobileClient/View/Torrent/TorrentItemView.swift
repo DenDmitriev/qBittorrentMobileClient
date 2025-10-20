@@ -17,22 +17,23 @@ struct TorrentItemView: View {
             TorrentTitleView(title: torrent.title)
             HStack(alignment: .bottom) {
                 TorrentTitleMetadataView(title: torrent.title)
+                Spacer()
                 TorrentDownloadView(
                     state: torrent.state,
                     progress: torrent.progress,
                     size: Int(torrent.size),
-                    dlspeed: torrent.dlspeed,
-                    upspeed: torrent.upspeed
+                    dlSpeed: torrent.dlSpeed,
+                    upSpeed: torrent.upSpeed
                 )
-                Spacer(minLength: 12)
                 DownloadButton(progress: torrent.progress, state: torrent.state) { action in
                     handleAction(action: action)
                 }
             }
         }
         .padding(12)
-        .background(.background)
+        .background(.backgroundThird)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.1), radius: 16, y: 4)
         .contextMenu {
             Button("Resume", systemImage: "play", action: { handleAction(action: .resume) } )
             Button("Force Start", systemImage: "forward", action: { handleAction(action: .forceStart) } )

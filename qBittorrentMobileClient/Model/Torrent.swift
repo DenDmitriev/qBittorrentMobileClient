@@ -17,7 +17,7 @@ struct Torrent: Codable, Hashable, Identifiable {
     let completionOn: Int
     let contentPath: String
     let dlLimit: Int
-    let dlspeed: Int
+    let dlSpeed: Int
     let downloadPath: String
     let downloaded: Int64
     let downloadedSession: Int64
@@ -56,7 +56,7 @@ struct Torrent: Codable, Hashable, Identifiable {
     let upLimit: Int
     let uploaded: Int64
     let uploadedSession: Int64
-    let upspeed: Int
+    let upSpeed: Int
     
     var id: String {
         hash
@@ -74,7 +74,7 @@ struct Torrent: Codable, Hashable, Identifiable {
         case completionOn = "completion_on"
         case contentPath = "content_path"
         case dlLimit = "dl_limit"
-        case dlspeed
+        case dlSpeed = "dlspeed"
         case downloadPath = "download_path"
         case downloaded
         case downloadedSession = "downloaded_session"
@@ -113,7 +113,7 @@ struct Torrent: Codable, Hashable, Identifiable {
         case upLimit = "up_limit"
         case uploaded
         case uploadedSession = "uploaded_session"
-        case upspeed
+        case upSpeed = "upspeed"
     }
 }
 
@@ -130,7 +130,7 @@ extension Torrent {
         completionOn = try container.decode(Int.self, forKey: .completionOn)
         contentPath = try container.decode(String.self, forKey: .contentPath)
         dlLimit = try container.decode(Int.self, forKey: .dlLimit)
-        dlspeed = try container.decode(Int.self, forKey: .dlspeed)
+        dlSpeed = try container.decode(Int.self, forKey: .dlSpeed)
         downloadPath = try container.decode(String.self, forKey: .downloadPath)
         downloaded = try container.decode(Int64.self, forKey: .downloaded)
         downloadedSession = try container.decode(Int64.self, forKey: .downloadedSession)
@@ -168,7 +168,7 @@ extension Torrent {
         upLimit = try container.decode(Int.self, forKey: .upLimit)
         uploaded = try container.decode(Int64.self, forKey: .uploaded)
         uploadedSession = try container.decode(Int64.self, forKey: .uploadedSession)
-        upspeed = try container.decode(Int.self, forKey: .upspeed)
+        upSpeed = try container.decode(Int.self, forKey: .upSpeed)
         
         // Декодирование строки состояния и преобразование в TorrentState
         let stateString = try container.decode(String.self, forKey: .state)
@@ -203,59 +203,13 @@ extension Torrent {
 }
 
 extension Torrent {
-    static let placeholder: Self = .init(
-        addedOn: 1754685932,
-        amountLeft: 19243466752,
-        autoTmm: false,
-        availability: 0.20100000500679016,
-        category: "",
-        completed: 18383634432,
-        completionOn: -10800,
-        contentPath: "/mnt/ssd/The Godfather Collection",
-        dlLimit: 0,
-        dlspeed: 588365,
-        downloadPath: "",
-        downloaded: 19500990734,
-        downloadedSession: 19500990734,
-        eta: 8640000,
-        fLPiecePrio: false,
-        forceStart: false,
-        hash: "d288323bb2c1b633e90394c5b1ac5c2ed2cb2b45",
-        infohashV1: "d288323bb2c1b633e90394c5b1ac5c2ed2cb2b45",
-        infohashV2: "",
-        lastActivity: 1754688672,
-        magnetUri: "magnet:?xt=urn:btih:d288323bb2c1b633e90394c5b1ac5c2ed2cb2b45&dn=The%20Godfather%20Collection&tr=http%3a%2f%2fbt.t-ru.org%2fann%3fmagnet",
-        maxRatio: -1,
-        maxSeedingTime: -1,
-        name: "The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]",
-        numComplete: 5,
-        numIncomplete: 87,
-        numLeechs: 0,
-        numSeeds: 0,
-        priority: 1,
-        progress: 0.4885742949503957,
-        ratio: 0,
-        ratioLimit: -2,
-        savePath: "/mnt/ssd",
-        seedingTime: 72295,
-        seedingTimeLimit: -2,
-        seenComplete: 1754688672,
-        seqDl: false,
-        size: 37627101184,
-        state: .pausedSeeding,
-        superSeeding: false,
-        tags: "",
-        timeActive: 75035,
-        totalSize: 96637579228,
-        tracker: "http://bt.t-ru.org/ann?magnet",
-        trackersCount: 1,
-        upLimit: 0,
-        uploaded: 0,
-        uploadedSession: 0,
-        upspeed: 0,
-        title: TorrentNameParser.parse("The Godfather Collection: The Coppola Restoration (Francis Ford Coppola) [1972/1974/1990, США, драма,]"),
-        torrentCategory: TorrentCategory(state: .pausedSeeding)
-    )
+    static let placeholder: Self = {
+        let url = Bundle.main.url(forResource: "Torrent", withExtension: "json")!
+        let data = try! Data(contentsOf: url)
+        let torrent = try! JSONDecoder().decode(Torrent.self, from: data)
+        
+        return torrent
+    }()
 }
 
 extension Array<Torrent> {

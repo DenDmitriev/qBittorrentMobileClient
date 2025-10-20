@@ -175,7 +175,12 @@ enum ServerError: Error {
 
 extension ServerError: LocalizedError {
     var errorDescription: String? {
-        return details.message
+        var message = details.message
+        if message.isEmpty, let description = details.error?.localizedDescription {
+            message = description
+        }
+        
+        return message
     }
 }
 

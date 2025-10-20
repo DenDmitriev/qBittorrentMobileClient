@@ -15,6 +15,9 @@ struct TorrentTitleMetadataView: View {
             switch title {
             case .movie(let movie):
                 VStack(alignment: .leading) {
+                    if let year = movie.year {
+                        YearView(year: year)
+                    }
                     if let format = movie.format {
                         VideoFormatView(format: format)
                     }
@@ -22,6 +25,9 @@ struct TorrentTitleMetadataView: View {
             case .series(let series):
                 VStack(alignment: .leading) {
                     SessionEpisodeView(session: series.session, episode: series.episode)
+                    if let year = series.year {
+                        YearView(year: year)
+                    }
                     if let format = series.format {
                         VideoFormatView(format: format)
                     }
@@ -30,7 +36,7 @@ struct TorrentTitleMetadataView: View {
                 EmptyView()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .multilineTextAlignment(.leading)
     }
 }
 

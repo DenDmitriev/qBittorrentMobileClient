@@ -138,3 +138,17 @@ extension TorrentContent {
         contentType: .init(type: .text, format: "txt")
     )
 }
+
+extension Array<TorrentContent> {
+    static var placeholder: Self = {
+        guard
+            let url = Bundle.main.url(forResource: "TorrentContent", withExtension: "json"),
+            let data = try? Data(contentsOf: url),
+            let torrentContent = try? JSONDecoder().decode([TorrentContent].self, from: data)
+        else {
+            return []
+        }
+        
+        return torrentContent
+    }()
+}

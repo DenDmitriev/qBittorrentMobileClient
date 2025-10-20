@@ -12,7 +12,7 @@ struct SessionEpisodeView: View {
     let episode: Int?
     
     var body: some View {
-        HStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             if let session {
                 HStack(spacing: 0) {
                     Text("Session")
@@ -35,7 +35,7 @@ struct SessionEpisodeView: View {
 }
 
 #Preview {
-    VStack {
+    VStack(spacing: 20) {
         SessionEpisodeView(session: 3, episode: 15)
         SessionEpisodeView(session: 1, episode: nil)
         SessionEpisodeView(session: nil, episode: 7)

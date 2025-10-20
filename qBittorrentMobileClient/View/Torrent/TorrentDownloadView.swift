@@ -11,49 +11,55 @@ struct TorrentDownloadView: View {
     let state: TorrentState
     let progress: Double
     let size: Int
-    let dlspeed: Int
-    let upspeed: Int
+    let dlSpeed: Int
+    let upSpeed: Int
     
     var body: some View {
-        VStack(alignment: .trailing) {
-            ByteView(item: .size(size))
-            
-            switch state {
-            case .downloading:
-                if progress < 1, dlspeed > 0 {
-                    ByteView(item: .speed(dlspeed)) {
-                        Image(systemName: "arrow.down")
-                            .foregroundStyle(.green)
-                    }
-                }
-                if upspeed > 0 {
-                    ByteView(item: .speed(upspeed)) {
-                        Image(systemName: "arrow.up")
-                            .foregroundStyle(.blue)
-                    }
-                }
-            case .seeding:
-                if upspeed > 0 {
-                    ByteView(item: .speed(upspeed)) {
-                        Image(systemName: "arrow.up")
-                            .foregroundStyle(.blue)
-                    }
-                }
-            case .pausedSeeding, .checking, .queued, .paused, .error, .missingFiles, .allocating, .moving, .unknown:
-                EmptyView()
-            }
-            
-            if progress < 1 {
-                let remainingTime = remainingTime()
-                if remainingTime > 0, let remainingTimeString = DateComponentsFormatter.timeRemaingFormatter.string(from: remainingTime) {
-                    HStack(spacing: .zero) {
-                        Image(systemName: "hourglass")
-                            .foregroundStyle(.blue)
-                        Text(remainingTimeString)
-                            .font(.system(.body))
+        HStack {
+            VStack(alignment: .trailing) {
+                ByteView(item: .size(size))
+                
+                if progress < 1 {
+                    let remainingTime = remainingTime()
+                    if remainingTime > 0, let remainingTimeString = DateComponentsFormatter.timeRemaingFormatter.string(from: remainingTime) {
+                        HStack(spacing: 4) {
+                            Text(remainingTimeString)
+                                .font(.system(.body))
+                            Image(systemName: "hourglass")
+                                .foregroundStyle(.blue)
+                        }
                     }
                 }
             }
+            
+            VStack(alignment: .trailing) {
+                switch state {
+                case .downloading:
+                    if progress < 1, dlSpeed > 0 {
+                        ByteView(item: .speed(dlSpeed)) {
+                            Image(systemName: "arrow.down")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    if upSpeed > 0 {
+                        ByteView(item: .speed(upSpeed)) {
+                            Image(systemName: "arrow.up")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                case .seeding:
+                    if upSpeed > 0 {
+                        ByteView(item: .speed(upSpeed)) {
+                            Image(systemName: "arrow.up")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                case .pausedSeeding, .checking, .queued, .paused, .error, .missingFiles, .allocating, .moving, .unknown:
+                    EmptyView()
+                }
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
         }
     }
     
@@ -62,14 +68,14 @@ struct TorrentDownloadView: View {
     }
     
     func remainingTime() -> TimeInterval {
-        guard dlspeed > 0 else {
+        guard dlSpeed > 0 else {
             return 0
         }
         
-        return TimeInterval(remainingSize) / TimeInterval(dlspeed)
+        return TimeInterval(remainingSize) / TimeInterval(dlSpeed)
     }
 }
 
 #Preview {
-    TorrentDownloadView(state: .downloading, progress: 0.5, size: 37627101184, dlspeed: 37627101, upspeed: 176271)
+    TorrentDownloadView(state: .downloading, progress: 0.5, size: 37627101184, dlSpeed: 37627101, upSpeed: 176271)
 }

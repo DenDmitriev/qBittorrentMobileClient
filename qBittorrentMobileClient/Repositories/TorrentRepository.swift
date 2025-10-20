@@ -39,6 +39,10 @@ class TorrentRepository {
         return try await mobileService.request(target: .torrent(.getTorrentContents(id: id)))
     }
     
+    func getTorrentProperties(id: Torrent.ID) async throws -> TorrentGenericProperties {
+        return try await mobileService.request(target: .torrent(.getTorrentProperties(id: id)))
+    }
+    
     func addTorrent(url: URL, paused: Bool, loadSequentially: Bool, downloadLimit: Int? = nil, uploadLimit: Int? = nil) async throws {
         try await mobileService.request(
             target: .torrent(
@@ -69,5 +73,13 @@ class TorrentRepository {
     
     func setFilePriority(torrentId: Torrent.ID, fileId: TorrentContent.ID, priority: TorrentPriority) async throws {
         try await mobileService.request(target: .torrent(.setFilePriority(torrentId: torrentId, fileId: fileId, priority: priority)))
+    }
+    
+    func setDownloadLimit(torrentId: Torrent.ID, limit: Int) async throws {
+        try await mobileService.request(target: .torrent(.setDownloadLimit(torrentId: torrentId, limit: limit)))
+    }
+    
+    func setUploadLimit(torrentId: Torrent.ID, limit: Int) async throws {
+        try await mobileService.request(target: .torrent(.setUploadLimit(torrentId: torrentId, limit: limit)))
     }
 }

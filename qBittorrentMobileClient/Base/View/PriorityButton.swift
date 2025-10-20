@@ -41,7 +41,7 @@ struct PriorityButton: View {
         case .doNotDownload:
             return .gray
         case .normal, .high, .maximal:
-            return .blue
+            return .accent
         }
     }
     

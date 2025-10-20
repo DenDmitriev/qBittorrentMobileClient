@@ -12,10 +12,17 @@ struct ContentIconView: View {
     
     var body: some View {
         VStack {
-            Image(systemName: contentType.type.icon)
-                .resizable()
-                .scaledToFit()
-                .aspectRatio(1, contentMode: .fit)
+            Circle()
+                .fill(.accent)
+                .overlay {
+                    Image(systemName: contentType.type.icon)
+                        .resizable()
+                        .scaledToFit()
+                        .aspectRatio(1, contentMode: .fit)
+                        .foregroundStyle(.white)
+                        .padding(8)
+                }
+            
             Text(contentType.format)
                 .font(.caption2)
                 .textCase(.uppercase)

@@ -61,7 +61,7 @@ extension TorrentCategory {
         case .seeding:
             self = .seeding
         case .pausedSeeding:
-            self = .paused
+            self = .downloaded
         case .error:
             self = .error
         case .missingFiles:

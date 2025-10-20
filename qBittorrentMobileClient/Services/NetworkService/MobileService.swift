@@ -2,11 +2,16 @@ import Foundation
 import Moya
 import Alamofire
 
-struct SessionSetupParameters {
-    let urlSessionConfiguration: URLSessionConfiguration
-    let sessionDelegate: SessionDelegate
-    let delegateQueue: OperationQueue
-    let underlyingDelegateQueue: DispatchQueue
+class CustomAlamofireSession: Alamofire.Session, @unchecked Sendable {
+    static let shared: CustomAlamofireSession = {
+        let configuration = URLSessionConfiguration.default
+        configuration.headers = .default  // Стандартные заголовки HTTP
+        configuration.timeoutIntervalForRequest = 3.0  // Таймаут для запроса в секундах (например, 3 сек)
+        configuration.timeoutIntervalForResource = 6.0 // Таймаут для всего ресурса (опционально, например, 6 сек)
+        configuration.requestCachePolicy = .useProtocolCachePolicy  // Политика кэширования
+        
+        return CustomAlamofireSession(configuration: configuration)
+    }()
 }
 
 class MobileService: BaseNetworkService<MobileApi> {
@@ -21,41 +26,13 @@ class MobileService: BaseNetworkService<MobileApi> {
         
         let apiProvider = MoyaProvider<MobileApi>(
             stubClosure: stubClosure,
-            session: Session.defaultWithoutCache ?? Session(),
+            session: CustomAlamofireSession.shared, // Before Session()
             plugins: [LoggerPlugin.instance]
         )
                 
         super.init(
             apiProvider: apiProvider,
             authRefreshProvider: authRefresher
-        )
-    }
-    
-    static func prepareForSessionConfiguration() -> SessionSetupParameters {
-        let configuration = URLSessionConfiguration.default
-        configuration.headers = .default
-        configuration.urlCache = nil
-        
-        let sessionDelegate = SessionDelegate()
-        
-        /// Целевая очередь, на которой выполняются блоки кода.
-        let rootQueue = DispatchQueue(label: "org.alamofire.session.rootQueue")
-        
-        /// Очередь из GCD, которую OperationQueue использует для вызова операций.
-        let serialRootQueue = DispatchQueue(label: rootQueue.label, target: rootQueue)
-        
-        /// Очередь, используемая библиотекой Pulse, для настройки URLSessionProxy.
-        let delegateQueue = OperationQueue(
-            maxConcurrentOperationCount: 1,
-            underlyingQueue: serialRootQueue,
-            name: "\(serialRootQueue.label).sessionDelegate"
-        )
-                        
-        return SessionSetupParameters(
-            urlSessionConfiguration: configuration,
-            sessionDelegate: sessionDelegate,
-            delegateQueue: delegateQueue,
-            underlyingDelegateQueue: serialRootQueue
         )
     }
 }

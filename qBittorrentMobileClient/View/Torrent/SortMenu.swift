@@ -36,7 +36,7 @@ struct SortMenu: View {
                 }
             }
         } label: {
-            Label("Sort", systemImage: sortDirection.systemImage)
+            Label("Sort", systemImage: "arrow.up.arrow.down")
         }
     }
 }

@@ -15,32 +15,22 @@ struct TorrentTitleView: View {
         case .movie(let movie):
             ZStack {
                 Text(movie.name)
-                    .font(.title3)
+                    .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .overlay(alignment: .topTrailing) {
-                if let year = movie.year {
-                    YearView(year: year)
-                }
             }
         case .series(let series):
             ZStack {
                 Text(series.name)
-                    .font(.title3)
+                    .font(.headline)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .overlay(alignment: .topTrailing) {
-                if let year = series.year {
-                    YearView(year: year)
-                }
-            }
         case .other(let other):
             Text(other.original)
-                .font(.title3)
+                .font(.headline)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)

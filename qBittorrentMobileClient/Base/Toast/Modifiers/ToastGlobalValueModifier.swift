@@ -56,9 +56,15 @@ struct ToastGlobalErrorValueModifier<Failure: Hashable & LocalizedError>: ViewMo
                     error = nil
                 }
             }
-            .onChange(of: isPresented) { _, newIsPresented in
+            .onChange(of: isPresented) {
+                _,
+                newIsPresented in
                 if newIsPresented {
-                    let toast = Toast(type: .error, text: error?.localizedDescription ?? String(localized: "Unknown error"))
+                    let toast = Toast(
+                        type: .error,
+                        text: error?.localizedDescription ?? String(localized: "Unknown error"),
+                        icon: .system("exclamationmark.triangle")
+                    )
                     toastRouter.showToast(item: toast, duration: duration)
                 } else {
                     toastRouter.dismissToast()

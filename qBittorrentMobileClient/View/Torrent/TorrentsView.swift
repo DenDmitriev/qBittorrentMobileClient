@@ -36,6 +36,7 @@ struct TorrentsView: View {
                 }
             }
         }
+        .background(Color.backgroundSecond)
         .ignoresSafeArea(.all, edges: .bottom)
         .stateFlow(
             _torrents.phase,
@@ -58,7 +59,7 @@ struct TorrentsView: View {
                 SortMenu(sort: $sort, sortDirection: $sortDirection)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(String(localized: "Add Torrent"), systemImage: "plus.circle.fill", action: showAddTorrentSheet)
+                Button(String(localized: "Add Torrent"), systemImage: "plus", action: showAddTorrentSheet)
             }
         }
         .onAppear {
